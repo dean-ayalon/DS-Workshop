@@ -84,14 +84,17 @@ model_fit = model.fit(train_x, train_y)
 model_fit.score(test_x, test_y)
 
 
-# Extracting predicted probabilities and adding them to the train_data dataframe
-probs = model_fit.predict_proba(train_x)[:,1]
-train_data["probability_of_click"] = probs
+# Testing the model on the test set
+
+# Extracting predicted probabilities and adding them to the test_data dataframe
+display_probs = model_fit.predict_proba(test_x)[:, 1]
+test_data["probability_of_click"] = display_probs
 
 # Testing the accuracy (currently using 0/1 loss)
-acc_test_frame = train_data[train_data.clicked == 1][["display_id", "ad_id"]]
+acc_test_frame = test_data[test_data.clicked == 1][["display_id", "ad_id"]]
 
-prediction_frame = train_data.sort_values(by="probability_of_click", ascending=False).groupby("display_id").first()
+prediction_frame = test_data.sort_values(by="probability_of_click", ascending=False)\
+    .groupby("display_id").first()
 predicted_ads = np.array(prediction_frame["ad_id"])
 
 acc_test_frame["prediction"] = predicted_ads
@@ -100,14 +103,31 @@ accuracy = sum(acc_test_frame.ad_id == acc_test_frame.prediction) / len(acc_test
 
 accuracy
 
+#Computing MAP@12 Accuracy
+test_displays = test_data.display_id.unique()
+acc_counter = 0
+counter = 0
+for display in test_displays:
+    if not counter % 1872:
+        print("processed " + str(round((100*counter/187234))) + "% of rows")
+    display_df = test_data[test_data.display_id == display]
+    #print(display_df.head())
+    true_ad = np.array(display_df[display_df.clicked == 1][["ad_id"]])[0][0]
+    #print(true_ad)
+    display_probs = np.array(display_df.probability_of_click)
+    #print(probs)
+    ads = np.array(display_df.ad_id)
+    #print(ads)
+    idx_sorted = display_probs.argsort()[::-1]
+    #rint(idx_sorted)
 
+    ads_sorted = ads[idx_sorted]
+    #print(ads_sorted)
 
+    idx_true = np.argwhere(ads_sorted == true_ad)[0][0] + 1
+    #print(1/idx_true)
+    acc_counter += 1 / idx_true
+    counter += 1
 
-
-
-
-
-
-
-
-
+accuracy_map = acc_counter / len(test_displays)
+accuracy_map
