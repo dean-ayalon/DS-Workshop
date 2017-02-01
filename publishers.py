@@ -4,16 +4,35 @@ import matplotlib.pyplot as plt
 
 #ads per publishers. each ad is connected to a publisher through the document it is leading to.
 ad_doc = pd.read_csv("C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/promoted_content.csv",
-                     nrows=1000000, usecols=["ad_id","document_id"])
+                     usecols=["ad_id","document_id"],iterator = True, chuncksize = 20000)
 
 doc_publisher = pd.read_csv("C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/documents_meta.csv",
-                     nrows=1000000, usecols=["document_id","publisher_id"])
+                            usecols=["document_id","publisher_id"],iterator = True, chuncksize = 20000)
 
 clicks = pd.read_csv("C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/clicks_train.csv",
-                     nrows=1000000, usecols=["ad_id","clicked"])
+                     usecols=["ad_id","clicked"],iterator = True, chuncksize = 20000)
 
-ad_publisher = ad_doc.merge(doc_publisher, on="document_id")
-ad_publisher = ad_publisher.drop("document_id",1)
+#returns a block of relavent docs, ads and displays
+relavent_docs = pd.read_csv("C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/fifth_merge_w_top_sim.csv",
+                           usecols = ["document_id_y"])
+relavent_docs = pd.Series(np.array(relavent_docs.document_id_y)).unique()
+
+relavent_ad = pd.read_csv("C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/fifth_merge_w_top_sim.csv",
+                           usecols = ["ad_id"])
+relavent_ad = pd.Series(np.array(relavent_ad.ad_id)).unique()
+
+relavent_disp = pd.read_csv("C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/fifth_merge_w_top_sim.csv",
+                           usecols = ["display_id"])
+relavent_disp = pd.Series(np.array(relavent_disp.display_id)).unique()
+
+
+#returns filtered tavles of doc_piblisher, clicks and ad_doc by document_id, display_id and ad_id
+relavent_doc_publisher =  pd.concat([chunk[chunk['document_id'].isin(relavent_docs)]for chunk in doc_publisher])
+relavent_clicks =  pd.concat([chunk[chunk['display_id'].isin(relavent_disp)]for chunk in clicks])
+relavent_ad = pd.concat([chunk[chunk['ad_id'].isin(relavent_disp)]for chunk in ad_doc])
+ad_publisher = relavent_ad.merge(relavent_docs, on="document_id")
+relavent_ad = relavent_ad.drop("document_id",1)
+skdsk
 ad_publisher_g = ad_publisher.groupby(["publisher_id"],as_index=False).agg({"ad_id":np.count_nonzero})
 
 publishers = np.array(ad_publisher_g["publisher_id"])
