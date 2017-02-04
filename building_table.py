@@ -208,7 +208,7 @@ print("finished entities")
 
 
 # Calculating similarities between documents
-from functions import find_similarity
+from utils.find_corelations_utils import find_similarity
 topic_similarities = []
 entities_similarities = []
 categories_similarities = []

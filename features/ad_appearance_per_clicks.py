@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from utils.plot import *
+from utils.plot_utils import *
 
 
 #how many times an ad appeared:
