@@ -27,6 +27,7 @@ adClicks = adClicks.groupby(["ad_id"],as_index=False).agg({"clicked":np.sum})
 adArr = np.array(adClicks["ad_id"])
 clicksArr = np.array(adClicks[["clicked"]])
 
+#TODO from some reason on Yairs computer runs get stuck, be carful if you ren this.
 create_simple_histogram(adArr,clicksArr,'Number of time ad got clicked',"Ad_ID","Clicks","clicks_per_ad.png")
 
 
