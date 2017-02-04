@@ -1,76 +1,70 @@
 import numpy as np
 import pandas as pd
-import sklearn.preprocessing
-from scipy.stats import describe
-from scipy.stats.mstats import mode
-import statsmodels.api as sm
-import gc
-import seaborn as sns
-import sys
 import time
-sns.set(color_codes=True)
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
 
-# Sampling a fourth of displays in the dataset
+# Sampling a fourth of displays in the entire dataset (clicks_train.csv)
 
-# importing clicks.csv
+# Importing display_id's from clicks.csv
 clicks = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
                          "Data/clicks_train.csv", usecols=["display_id"])
 
-np.random.RandomState(0)
-
-displays_ids = clicks.display_id
-unique_displays = displays_ids.unique()
+unique_displays = clicks.display_id.unique()
 l = len(unique_displays)
 
+sampled_displays = np.random.RandomState(0).choice(unique_displays, size=4218648)
 
-chosen_displays = np.random.choice(unique_displays, size=4218648)
+# Generating a new dataframe from events.csv containing only the sampled displays
+reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
+                                      "Data/events.csv", usecols=["display_id", "document_id", "timestamp"],
+                                      iterator=True, chunksize=20000)
+sampled_events = pd.concat([chunk[chunk['display_id'].isin(sampled_displays)] for chunk in reading_chunks_iterator])
+sampled_events.to_csv("sampled_events.csv", index=False)
 
-# Generating a separate dataframe containing only the chosen displays
-iter_csv = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                         "Data/events.csv", iterator=True, chunksize=20000)
-df = pd.concat([chunk[chunk['display_id'].isin(chosen_displays)] for chunk in iter_csv])
-print("finished creating df")
+print("saved sampled_events")
+# Generating a new dataframe from clicks_train.csv containing only the sampled displays
+reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
+                         "Data/clicks_train.csv", iterator=True, chunksize=20000)
+sampled_clicks = pd.concat([chunk[chunk['display_id'].isin(sampled_displays)] for chunk in reading_chunks_iterator])
+sampled_clicks.to_csv("sampled_clicks.csv", index=False)
+print("saved sampled_clicks")
 
-df.to_csv("sampled_events.csv")
 
-print("saved to csv")
+####Reset / Clear Memory ####
+
 
 # Reloading the sampled tables
-
 clicks = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                         "Data/sampled_clicks.csv", usecols=["display_id", "ad_id", "clicked"])
+                         "Data/sampled_clicks.csv")
 
 events = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                         "Data/sampled_events.csv", usecols=["display_id", "document_id", "timestamp",
-                                                             "platform", "geo_location"])
-print("finished loading")
+                         "Data/sampled_events.csv")
+
 
 # Beginning preprocessing
+# Turning current click timestamps to real timestamps by adding 1465876799998 and dividing by 1000 to get timestamp in
+# seconds instead of ms
+current_timestamps = events["timestamp"]
 
-# Turning current timestamps to real timestamps
-current_timestamp = events["timestamp"]
+real_timestamps = np.array(current_timestamps + 1465876799998) // 1000
 
-real_timestamp = np.array(current_timestamp + 1465876799998) // 1000
-
-events["timestamp"] = real_timestamp
+events["timestamp"] = real_timestamps
 
 # Initial merging
+initial_merge = clicks.merge(events, on="display_id")
 
-merged_1 = clicks.merge(events, on="display_id")
-print("finished merge")
+initial_merge.rename(index=str, columns={"timestamp": "click_tstamp"}, inplace=True)
 
-merged_1.rename(index=str, columns={"timestamp" : "click_tstamp"}, inplace=True)
-
-merged_1.to_csv("first_merge.csv", index=False)
+initial_merge.to_csv("initial_merge.csv", index=False)
 
 
-# Reloading first merge
-data = pd.read_csv('C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain '
-                   'Data/first_merge.csv')
+####Reset / Clear Memory ####
 
+
+# Reloading initial merge
+initial_merge = pd.read_csv('C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain '
+                   'Data/initial_merge.csv')
+
+# Loading promoted_content.csv and documents_meta.csv
 promoted = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
                          "Data/promoted_content.csv", usecols=["document_id", "ad_id"])
 
@@ -78,25 +72,24 @@ meta = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Out
                          "Data/documents_meta.csv", usecols=["document_id", "publish_time"])
 
 
-merged_2 = data.merge(promoted, on='ad_id', how='left', sort=False)
+# Merging with promoted
+merged_with_promoted = initial_merge.merge(promoted, on='ad_id', how='left', sort=False)
+merged_with_promoted.head()
 
-merged_2.head()
+# Merging with meta
+meta.rename(index=str, columns={"document_id": "document_id_y"}, inplace=True)
+merged_with_meta = merged_with_promoted.merge(meta, on="document_id_y", how='left')
+merged_with_meta.to_csv("merged_with_meta.csv", index=False)
 
+# Now we need to filter out displays that contain invalid publish timestamps -
+# Either before 1971 or after 28.6.2016, or contain a null publish timestamp
 
-meta.rename(index=str, columns={"document_id" : "document_id_y"}, inplace=True)
-
-merged_3 = merged_2.merge(meta, on="document_id_y", how='left')
-
-merged_3.head()
-
-merged_3.to_csv("third_merge.csv")
-
-# Finding problematic timestamps (before 1971 or after 28.6.2016)
+# Finding displays with invalid timestamps
 counter = 0
 problem_displays = []
-for row in merged_3.itertuples():
+for row in merged_with_meta.itertuples():
     if not counter % 1926862:
-        print("passed through " + str(counter*100/19268603) + "% of rows")
+        print("passed through " + str(round(counter*100/19268603)) + "% of rows")
     if type(row[-1]) != str:
             problem_displays.append(row[1])
     else:
@@ -109,14 +102,13 @@ for row in merged_3.itertuples():
         elif year == 2016:
             if not ((month == 6 and day <= 28) or month <= 5):
                 problem_displays.append(row[1])
-                # print("bad month or day in 2016")
-
     counter += 1
 
 problem_displays = pd.Series(problem_displays).unique()
-all_displays = merged_3.display_id.unique()
+all_displays = merged_with_meta.display_id.unique()
 good_displays = []
 
+# Creating a new array, containing only "good" displays - containing valid publish timestamps
 current_bad_display_index = 0
 current_bad_display = problem_displays[0]
 for i in range(len(all_displays)):
@@ -126,95 +118,80 @@ for i in range(len(all_displays)):
         good_displays.append(current_disp)
     else:
         current_bad_display_index += 1
-
-
 good_displays = pd.Series(good_displays)
 
 # Generating a new dataframe containing only displays with valid timestamps
-iter_csv = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                         "Data/third_merge.csv", iterator=True, chunksize=20000)
-merged_4 = pd.concat([chunk[chunk['display_id'].isin(good_displays)] for chunk in iter_csv])
+reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
+                         "Data/merged_with_meta.csv", iterator=True, chunksize=20000)
+merged_with_meta_only_good_displays = pd.concat([chunk[chunk['display_id'].isin(good_displays)] for chunk in reading_chunks_iterator])
 
-merged_4.head(100)
-
-
-merged_4.to_csv("fourth_merge.csv", index=False)
+merged_with_meta_only_good_displays.to_csv("merged_with_meta_only_good_displays.csv", index=False)
 
 
+#### Reset / Clear Memory ####
 
 
-
-#######################
 # Loading 4th merged table
 
-merged_4 = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                         "Data/fourth_merge.csv", usecols=["display_id", "ad_id", "clicked", "document_id_x",
-                                                           "click_tstamp", "platform", "geo_location",
-                                                           "document_id_y", "publish_time"])
-# Calculating "ad age" = click_timestamp - publish_timestamp in days
-times = merged_4.publish_time
-real_times = []
+merged_with_meta_only_good_displays = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
+                         "Data/merged_with_meta_only_good_displays.csv")
 
-for i in range(len(times)):
-    time_struct = time.strptime(times[i], "%Y-%m-%d %H:%M:%S")
-    real_times.append(int(time.mktime(time_struct)))
+from ad_age_calculator import ad_age_calculator
+# Adding first feature ->  "ad age" = click_timestamp - publish_timestamp in days
+publish_times = merged_with_meta_only_good_displays.publish_time
+click_times = merged_with_meta_only_good_displays.click_tstamp
+ad_ages_in_days = ad_age_calculator(publish_times, click_times)
 
-real_times[:10]
+merged_with_meta_only_good_displays["ad_age_in_days"] = ad_ages_in_days
 
-click_times = merged_4.click_tstamp
+# Dropping click timestamps and publish timestamps - no longer needed
+merged_with_meta_only_good_displays.drop(["click_tstamp", "publish_time"], axis=1, inplace=True)
 
-ad_ages = click_times - real_times
-ad_ages_in_days = ad_ages / 86400
+merged_with_meta_only_good_displays.to_csv("merged_with_meta_only_good_displays_with_ad_age.csv", index=False)
 
 
-merged_4["ad_age_in_days"] = ad_ages_in_days
+#### Reset / Clear Memory ####
 
-merged_4.drop(["click_tstamp", "publish_time"], axis=1, inplace=True)
+merged_with_meta_only_good_displays = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
+                         "Data/merged_with_meta_only_good_displays_with_ad_age.csv")
 
-
-merged_4.to_csv("fourth_merge_w_ad_age.csv", index=False)
-
-
-#############################################
-
-merged_4 = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                         "Data/fourth_merge_w_ad_age.csv")
-
-docs_1 = np.array(merged_4.document_id_x)
-docs_2 = np.array(merged_4.document_id_y)
-docs_3 = np.concatenate((docs_1, docs_2))
-docs_3 = pd.Series(docs_3).unique()
+# In order to filter the relevant dataframes to include only relevant documents,
+# We first create an array containing only the document_id's appearing in the sampled displays
+docs_out = np.array(merged_with_meta_only_good_displays.document_id_x)
+docs_in = np.array(merged_with_meta_only_good_displays.document_id_y)
+all_docs = np.concatenate((docs_out, docs_in))
+all_docs = pd.Series(all_docs).unique()
 
 
 # Creating filtered versions of document attributes tables to include only relevant displays,
 # This makes calculations down the road much quicker
-iter_csv = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
+reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
                          "Data/documents_topics.csv", iterator=True, chunksize=20000)
-topics = pd.concat([chunk[chunk['document_id'].isin(docs_3)] for chunk in iter_csv])
+topics = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in reading_chunks_iterator])
 
 print("finished topics")
 
-iter_csv = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
+reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
                          "Data/documents_categories.csv", iterator=True, chunksize=20000)
-categories = pd.concat([chunk[chunk['document_id'].isin(docs_3)] for chunk in iter_csv])
+categories = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in reading_chunks_iterator])
 
 print("finished categories")
 
-iter_csv = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
+reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
                          "Data/documents_entities.csv", iterator=True, chunksize=20000)
-entities = pd.concat([chunk[chunk['document_id'].isin(docs_3)] for chunk in iter_csv])
+entities = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in reading_chunks_iterator])
 
 print("finished entities")
 
 
-# Calculating similarities between documents
-from utils.find_corelations_utils import find_similarity
+# Calculating similarity features between documents
+from functions import find_similarity
 topic_similarities = []
 entities_similarities = []
 categories_similarities = []
 
 counter = 0
-for row in merged_4.itertuples():
+for row in merged_with_meta_only_good_displays.itertuples():
     if not counter % 41432:
         print("passed through " + (str(round(counter * 100 / 4143291))) + "% of rows")
     doc_out = row[4]
@@ -234,13 +211,13 @@ for row in merged_4.itertuples():
     #     str(entities_similarity))
     counter += 1
 
-# Saving the final table
+# Creating the final table
 
-merged_4["topic_sim"] = topic_similarities
-merged_4["entities_sim"] = entities_similarities
-merged_4["categories_sim"] = categories_similarities
+merged_with_meta_only_good_displays["topic_sim"] = topic_similarities
+merged_with_meta_only_good_displays["entities_sim"] = entities_similarities
+merged_with_meta_only_good_displays["categories_sim"] = categories_similarities
 
-merged_4.to_csv("fifth_merge.csv", index=False)
+merged_with_meta_only_good_displays.to_csv("final_dataset.csv", index=False)
 
 
 ###################################################
