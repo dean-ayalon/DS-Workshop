@@ -7,6 +7,7 @@ import pandas as pd
 
 def create_publishers_popularity_feature(main_table):
     #ads per publishers. each ad is connected to a publisher through the document it is leading to.
+    #TODO: all the tables and the filtered tables should be later passed as an arguments to this pocedure!
     ad_doc = pd.read_csv(PROMOTED_CONTENT_YAIR, usecols=["ad_id","document_id"],iterator = True, chunksize = 20000)
 
     doc_publisher = pd.read_csv(DOC_META_YAIR, usecols=["document_id","publisher_id"],iterator = True, chunksize = 20000)
@@ -20,9 +21,7 @@ def create_publishers_popularity_feature(main_table):
 
 
     #returns filtered tables of doc_publisher, clicks and ad_doc by document_id, display_id and ad_id
-    #TODO: create function filter_table_by_uniqe_ids
     relavent_doc_publisher = filter_table_by_unique_ids(relavent_docs,'document_id',doc_publisher) #return all the relevant docs from doc_publisher
-    #TODO: why does the second one takes so long??
     relavent_clicks = filter_table_by_unique_ids(relavent_disp,'display_id',clicks) #return all the relevant displayes in clicks
     relavent_ad = filter_table_by_unique_ids(relavent_ad,'ad_id',ad_doc) #return all the relevant ads in ad_doc
 

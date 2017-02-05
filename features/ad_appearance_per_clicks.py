@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 
 def create_ad_appearance(main_table):
     #how many times an ad appeared:
-    clicks = pd.read_csv(CLICKS_YAIR, usecols=['ad_id','clicked'])
-    relevant_ads = return_unique_values_of_column_from_table('ad_id',main_table)
+    clicks = pd.read_csv(CLICKS_YAIR, usecols=['ad_id','clicked'],iterator = True, chunksize = 20000)
+    relevant_ads = return_unique_values_of_column_from_table('ad_id',MAIN_TABLE_YAIR)
     filtered_clicks = filter_table_by_unique_ids(relevant_ads,'ad_id',clicks)
 
     adAppearance = filtered_clicks.drop(['clicked'],axis=1)
