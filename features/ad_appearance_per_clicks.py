@@ -8,13 +8,17 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
-def create_ad_appearance(main_table):
+def create_ad_appearance(main_table,squared = False,onlyClicks=False):
     #how many times an ad appeared:
+    '''
+    #this code filters clicks by ad_id. seems to be unnecessary
     clicks = pd.read_csv(CLICKS_YAIR, usecols=['ad_id','clicked'],iterator = True, chunksize = 20000)
     relevant_ads = return_unique_values_of_column_from_table('ad_id',MAIN_TABLE_YAIR)
     filtered_clicks = filter_table_by_unique_ids(relevant_ads,'ad_id',clicks)
+    '''
+    clicks = pd.read_csv(MAIN_TABLE_YAIR, usecols=['ad_id','clicked'])
 
-    adAppearance = filtered_clicks.drop(['clicked'],axis=1)
+    adAppearance = clicks.drop(['clicked'],axis=1)
     adAppearance["appearance"] = adAppearance["ad_id"]
     adAppearance = adAppearance.groupby(["ad_id"],as_index=False).agg({"appearance":np.count_nonzero})
 
@@ -26,12 +30,20 @@ def create_ad_appearance(main_table):
     '''
 
     #how many times an ad got a click
+    adClicks = clicks.groupby(["ad_id"],as_index=False).agg({"clicked":np.sum})
 
-    adClicks = filtered_clicks.groupby(["ad_id"],as_index=False).agg({"clicked":np.sum})
-    adAppearance = adAppearance.merge(adClicks,on = "ad_id")
-    adAppearance['clicks_per_appearance'] = adAppearance['clicked']/adAppearance['appearance']
-    adAppearance.drop(adAppearance.columns[[1,2]],axis=1,inplace=True)
+    #clicks in relation to appearence
+    #TODO: we did NOT gave any weight to the apearance, means ad who appeared once and got click will
+    #TODO: get the same rate as an ad who appeared 127 times and got 127 clicks. is that right?
+    #TODO: maybe it is better just to count clicks? or to power the clicks values by 2? should try.
+
+    clicks_r_appearance = adAppearance.merge(adClicks,on = "ad_id")
+    clicks_r_appearance['clicks_per_appearance'] = clicks_r_appearance['clicked']/clicks_r_appearance['appearance']
+    clicks_r_appearance.drop(clicks_r_appearance.columns[[1,2]],axis=1,inplace=True)
     return adAppearance
+
+T = create_ad_appearance("")
+print(T.head(10))
 
 '''
 adArr = np.array(adClicks["ad_id"])

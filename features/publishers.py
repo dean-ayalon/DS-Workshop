@@ -72,3 +72,5 @@ ppf.head()
 
 #remarks:
 #some document_id's who appears in doc_meta does not appear on promoted content, and the opposite.
+
+#TODO: half of the ads has no publisher! does it worth the sacrefice?

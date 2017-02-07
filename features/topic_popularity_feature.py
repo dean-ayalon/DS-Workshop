@@ -10,7 +10,7 @@ import statsmodels.api as sm
 def create_topics_popularity(main_table,with_confidence = True):
     #------------------------------Clicks per topic----------------------
     #TODO update to correct columns names
-    relavent_ads_ands_docs = pd.read_csv(MAIN_TABLE_YAIR ,usecols=["document_id_y", "ad_id", "clicked"])
+    relavent_ads_ands_docs = pd.read_csv(main_table ,usecols=["document_id_y", "ad_id", "clicked"])
     relavent_ads_ands_docs.rename(index=str, columns={"document_id_y": "document_id"},inplace=True)
 
     topics = pd.read_csv(DOC_TOPICS_YAIR, usecols=["document_id", "confidence_level", "topic_id"])
@@ -49,5 +49,5 @@ def create_topics_popularity(main_table,with_confidence = True):
     return topic_popularity
 
 
-T = create_topics_popularity("")
+T = create_topics_popularity(MAIN_TABLE_YAIR)
 print(T.head(10))
