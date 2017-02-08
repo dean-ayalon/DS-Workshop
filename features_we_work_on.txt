@@ -10,3 +10,7 @@ Remember not to delete any feature! we need them to show our work process
  - Publisher_popularity - Done, might not get into model
  - Topic_popularity - Done
  - Clicks_per_ad_appearence - Done
+
+
+#Ideas for features:
+ - 
