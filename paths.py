@@ -11,6 +11,7 @@ EVENTS_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/
 DOC_CATEGORIES_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/documents_categories.csv"
 DOC_ENTETIES_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/documents_entities.csv"
 MAIN_TABLE_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/fifth_merge_w_top_sim.csv"
+PAGE_VIEWS_YAIR =  "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/page_views_sample.csv"
 
 
 #Deans paths
