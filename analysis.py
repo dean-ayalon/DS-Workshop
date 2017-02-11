@@ -30,7 +30,7 @@ for feature in features:
 
 # Rearranging so "clicked" column is last
 cols = final.columns.tolist()
-cols = cols[:2] + cols[3:7] + [cols[2]]
+cols = cols[:2] + cols[3:] + [cols[2]]
 final = final[cols]
 
 # Splitting to train (80%) and test (20%) sets
