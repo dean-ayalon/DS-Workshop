@@ -1,7 +1,7 @@
 Remember not to delete any feature! we need them to show our work process
 
 #Dean:
-
+- Time Related features (is_weekend?, binning of hours (morning, afternoon, evening, night)...)
 
 #Eran:
 
