@@ -15,7 +15,7 @@ def is_weekend(main_table):
         as_datetime64 = np.datetime64(int(timestamps[i]), 's')
         as_datetime = pd.to_datetime(as_datetime64)
 
-        # Using the is_busday to return an is_weekend boolean - True for Saturday and Sunday, False otherwise
+        # Using the is_busday function to return an is_weekend boolean - True for Saturday and Sunday, False otherwise
         boolean = np.is_busday(as_datetime, weekmask='0000011')
         is_weekend_boolean[i] = boolean
 
