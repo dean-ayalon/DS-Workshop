@@ -19,14 +19,25 @@ main = pd.read_csv(MAIN_TABLE_YAIR, usecols=["ad_id","document_id_y","clicked"])
 main = main.rename(index=str, columns={"document_id_y" : "document_id"})
 
 #create views per add
+
+#len: 59849
 views_per_doc = page_views.groupby(["document_id"],as_index=False).agg({"uuid":np.count_nonzero})
+#len: 1331
 views_per_add = views_per_doc.merge(main, on="document_id").drop(['document_id','clicked'],axis=1).drop_duplicates()\
     .rename(index=str, columns={"uuid" : "views_per_ad"})
 
 #create_simple_histogram(np.array(views_per_add.ad_id),np.array(views_per_add.views_per_ad),"Views per ad","Ad-id","Views","views_per_ad.png")
 
+#len: 148393
 clicks_per_ad = main.groupby(["ad_id"],as_index=False).agg({"clicked":np.sum})
 
-#create_simple_histogram(np.array(clicks_per_ad.ad_id),np.array(clicks_per_ad.clicked),"Clicks per Ad","Ad-id","Clicks","clicks_per_ad.png")
+#TODO: you can see that different ads of the same doc got different ammount of clicks. maybe we should consider that.
+#TODO for eample - for each doc, check what was the most popular ad.
+clicks_views_ratio = views_per_add.merge(clicks_per_ad,on="ad_id")
+
+clicks_views_ratio["clicks/views"] = clicks_views_ratio["clicked"]/clicks_views_ratio["views_per_ad"]
+clicks_views_ratio.drop(['views_per_ad','clicked'],axis=1, inplace=True)
+
+#create_simple_histogram(np.array(clicks_views_ratio.ad_id),np.array(clicks_views_ratio["clicks/views"]),"Clicks/views per ad","ad_id","clicks/views","clicks_views_ratio.png")
 
 
