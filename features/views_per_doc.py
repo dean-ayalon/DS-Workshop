@@ -16,8 +16,8 @@ also:
 
 def create_clicks_views_ratio_feature(main_table,page_views):
     #load relavent tables
-    page_views = pd.read_csv(page_views, usecols=["uuid","document_id"])
-    main = pd.read_csv(main_table, usecols=["ad_id","document_id_y","clicked"])
+    page_views = page_views[["uuid","document_id"]]
+    main = main_table[["ad_id","document_id_y","clicked"]]
     main = main.rename(index=str, columns={"document_id_y" : "document_id"})
 
     #create views per add
@@ -43,6 +43,12 @@ def create_clicks_views_ratio_feature(main_table,page_views):
     #create_simple_histogram(np.array(clicks_views_ratio.ad_id),np.array(clicks_views_ratio["clicks/views"]),"Clicks/views per ad","ad_id","clicks/views","clicks_views_ratio.png")
     return clicks_views_ratio
 
-#a = create_clicks_views_ratio_feature(MAIN_TABLE_YAIR,PAGE_VIEWS_YAIR)
-#print(a.head())
+'''
+#test:
+main_table = pd.read_csv(MAIN_TABLE_YAIR)
+page_views = pd.read_csv(PAGE_VIEWS_YAIR)
+a = create_clicks_views_ratio_feature(main_table,page_views)
+print(a.head())
+'''
+
 
