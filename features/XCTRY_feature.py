@@ -19,6 +19,7 @@ post: the function will return the dataframe ["ad_id",Pr[clicked = 1 | X,Y] ]
 def XCTRY(main_table,table_X,table_Y,feature_name_X,feature_name_Y,join_column,with_test=False,test_row_no=100):
     ad_and_feature_X = table_X[['ad_id',feature_name_X,join_column]]
     feature_Y = table_Y[[join_column,feature_name_Y]]
+    main_table = main_table[['ad_id','clicked']]
     X_Y_and_ad = ad_and_feature_X.merge(feature_Y, on=join_column)
     X_Y_and_ad.drop([join_column],axis=1, inplace=True)
 
