@@ -5,3 +5,6 @@
 .idea/
 *.dll
 .idea
+.idea/DS-Workshop.iml
+.idea/misc.xml
+.idea/workspace.xml
