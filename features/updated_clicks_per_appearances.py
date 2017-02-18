@@ -8,7 +8,7 @@ import pandas as pd
 
 
 # Accepts the main table as an argument (already as a Pandas object)
-def calculate_clicks_per_appearances_ratio(main_table):
+def add_clicks_per_appearances_ratio_feature(main_table):
     # Slicing only necessary columns
     table = main_table[["ad_id", "clicked"]]
     # Calculating clicks/appearances ratio

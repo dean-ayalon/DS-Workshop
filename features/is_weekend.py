@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd
 
 
-def is_weekend(main_table):
+def add_is_weekend_feature(main_table):
 
     # Extracting relevant columns from main table
-    table = main_table[["display_id", "click_tstamp"]]
+    table = main_table.groupby("display_id").first().reset_index()[["display_id", "click_tstamp"]]
     timestamps = table["click_tstamp"]
     # Initializing empty is_weekend array
     is_weekend_boolean = np.zeros(shape=len(timestamps))

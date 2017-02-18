@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def ad_count_per_display(main_table):
+def add_ad_count_per_display_feature(main_table):
     # Extracting the display_id's vector from main table
     displays_and_ads = main_table[["display_id"]]
 

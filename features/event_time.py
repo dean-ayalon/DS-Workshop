@@ -12,12 +12,15 @@ import pandas as pd
 # Evening - 20:00 to 23:59
 # Night - 00:00 to 06:59
 
-def event_time_bin(main_table):
+
+def add_event_time_bin_feature(main_table):
+    working_table = main_table.groupby("display_id").first().reset_index()
+
     relevant_countries = ["CA", "US", "AU", "GB"]
     hours = list(range(24))  # Used to make hour calculations in modulo 24
 
-    click_timestamps = main_table["click_tstamp"]
-    geolocations = main_table["geo_location"]
+    click_timestamps = working_table["click_tstamp"]
+    geolocations = working_table["geo_location"].apply(str)
 
     localized_hours = []
     for i in range(len(geolocations)):
@@ -30,21 +33,23 @@ def event_time_bin(main_table):
                 timezone_correction = -5
             elif country == "AU":
                 timezone_correction = 10
-
         timestamp = click_timestamps[i]
         as_datetime64 = np.datetime64(int(timestamp), 's')
         as_datetime = pd.to_datetime(as_datetime64)
-        localized_hour = hours[as_datetime.hour + timezone_correction]
+        corrected_hour = as_datetime.hour + timezone_correction
+        if corrected_hour > 23:
+            corrected_hour -= 24
+        localized_hour = hours[corrected_hour]
         localized_hours.append(localized_hour)
 
 
     # Creating boolean vectors for "binning" the hours
     localized_hours = pd.Series(localized_hours)
-    is_morning = np.zeros(shape=len(main_table))
-    is_noon = np.zeros(shape=len(main_table))
-    is_afternoon = np.zeros(shape=len(main_table))
-    is_evening = np.zeros(shape=len(main_table))
-    is_night = np.zeros(shape=len(main_table))
+    is_morning = np.zeros(shape=len(working_table))
+    is_noon = np.zeros(shape=len(working_table))
+    is_afternoon = np.zeros(shape=len(working_table))
+    is_evening = np.zeros(shape=len(working_table))
+    is_night = np.zeros(shape=len(working_table))
 
     for i in range(len(localized_hours)):
         if 7 <= localized_hours[i] < 12:
@@ -59,7 +64,7 @@ def event_time_bin(main_table):
             is_night[i] = 1
 
     res_table = pd.DataFrame()
-    res_table["display_id"] = main_table["display_id"]
+    res_table["display_id"] = working_table["display_id"]
     res_table["is_morning"] = is_morning
     res_table["is_noon"] = is_noon
     res_table["is_afternoon"] = is_afternoon
@@ -67,4 +72,3 @@ def event_time_bin(main_table):
     res_table["is_night"] = is_night
 
     return res_table
-
