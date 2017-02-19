@@ -5,15 +5,14 @@ from paths import *
 import numpy as np
 import pandas as pd
 
-def create_publishers_popularity_feature(main_table):
+def create_publishers_popularity_feature(main_table,promoted,meta):
     #ads per publishers. each ad is connected to a publisher through the document it is leading to.
     #TODO: all the tables and the filtered tables should be later passed as an arguments to this pocedure!
-    ad_doc = pd.read_csv(PROMOTED_CONTENT_YAIR, usecols=["ad_id","document_id"],iterator = True, chunksize = 20000)
+    ad_doc = promoted[["ad_id","document_id"]]
+    doc_publisher =meta[["document_id","publisher_id"]]
+    main_table = main_table[["ad_id","clicked","display_id"]]
 
-    doc_publisher = pd.read_csv(DOC_META_YAIR, usecols=["document_id","publisher_id"],iterator = True, chunksize = 20000)
-
-    clicks = pd.read_csv(CLICKS_YAIR, usecols=["ad_id","clicked","display_id"],iterator = True, chunksize = 20000)
-
+    '''
     #returns single columns of relavent docs, ads and displays
     relavent_docs = return_unique_values_of_column_from_table("document_id_y",main_table)
     relavent_ad = return_unique_values_of_column_from_table("ad_id",main_table)
@@ -25,9 +24,10 @@ def create_publishers_popularity_feature(main_table):
     relavent_clicks = filter_table_by_unique_ids(relavent_disp,'display_id',clicks) #return all the relevant displayes in clicks
     relavent_ad = filter_table_by_unique_ids(relavent_ad,'ad_id',ad_doc) #return all the relevant ads in ad_doc
 
+    '''
 
     #creates number of ads per publisher dataframe
-    ad_publisher = relavent_ad.merge(relavent_doc_publisher, on="document_id") #merge relevant ads with relevant docs
+    ad_publisher = ad_doc.merge(doc_publisher, on="document_id") #merge relevant ads with relevant docs
     ad_publisher.drop(['document_id'],axis=1,inplace=True)
     ad_publisher_g = ad_publisher.groupby(["publisher_id"],as_index=False).agg({"ad_id":np.count_nonzero})
 
@@ -41,7 +41,7 @@ def create_publishers_popularity_feature(main_table):
 
     #now clicks per publisher
     #we need to agragate first in order to prevent multiplies (many ads in different displays)
-    clicks_g = relavent_clicks.groupby(["ad_id"], as_index = False).agg({"clicked":np.sum})
+    clicks_g = main_table.groupby(["ad_id"], as_index = False).agg({"clicked":np.sum})
     clicks_publishers = ad_publisher.merge(clicks_g,on = "ad_id")
     clicks_publishers = clicks_publishers.drop("ad_id",1)
     clicks_publishers_g = clicks_publishers.groupby(["publisher_id"], as_index = False).agg({"clicked":np.sum})
@@ -64,9 +64,11 @@ def create_publishers_popularity_feature(main_table):
 
     return ad_publisher_pop
 
-
-ppf = create_publishers_popularity_feature(MAIN_TABLE_YAIR)
-ppf.head()
+promoted = pd.read_csv(PROMOTED_CONTENT_YAIR)
+meta = pd.read_csv(DOC_META_YAIR)
+main_table = pd.read_csv(MAIN_TABLE_YAIR)
+ppf = create_publishers_popularity_feature(main_table,promoted,meta)
+print(ppf.head(10))
 
 
 
