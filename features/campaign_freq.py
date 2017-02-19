@@ -13,16 +13,20 @@ from paths import *
 import numpy as np
 import pandas as pd
 
-## similar to advertiser_freq, returns a mapping of ads and their campaign's "frequency"
-##that is, num. of ads belonging to same campaign
+# Similar to advertiser_freq, returns a mapping of ads and their campaign's "frequency"
+# That is, num. of ads belonging to same campaign
+
+#promoted = pd.read_csv(r"C:\Users\Dean\Documents\Semester G\Data Science Workshop\Outbrain Data\promoted_content.csv")
+#promoted = pd.read_csv()
+
 def campaign_freq(promoted):
-    #loading the relevant tables
-    ad_campaigns = promoted[["ad_id","campaign_id"]]
-    #counting the number of times an advertiser appeared:
-    ad_per_campaign = ad_campaigns.groupby(["campaign_id"],as_index=False).agg({"ad_id":np.count_nonzero})\
-        .rename(index=str, columns={"ad_id" : "ads_per_campaign"})
-    campaign_freq_per_ad = ad_campaigns.merge(ad_per_campaign, on="campaign_id")
-    campaign_freq_per_ad.drop(['campaign_id'],axis=1, inplace=True)
+    # Loading the relevant tables
+    ad_campaigns = promoted[["ad_id", "campaign_id"]]
+    # Counting the number of times an advertiser appeared:
+    ad_per_campaign = ad_campaigns.groupby(["campaign_id"], as_index=False).agg({"ad_id": np.count_nonzero})\
+        .rename(index=str, columns={"ad_id": "ads_per_campaign"})
+    campaign_freq_per_ad = ad_campaigns.merge(ad_per_campaign, on="campaign_id", copy=False)
+    campaign_freq_per_ad.drop(['campaign_id'], axis=1, inplace=True)
     return campaign_freq_per_ad
 
 

@@ -8,6 +8,8 @@ print("Beginning building of main table...")
 clicks = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
                          "Data/clicks_train.csv", usecols=["display_id"])
 
+del clicks  # No longer needed
+
 unique_displays = clicks.display_id.unique()
 l = len(unique_displays)
 
@@ -15,7 +17,8 @@ sampled_displays = np.random.RandomState(0).choice(unique_displays, size=527331,
 
 # Generating a new dataframe from events.csv containing only the sampled displays
 reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                                      "Data/events.csv", iterator=True, chunksize=20000)
+                                      "Data/events.csv", iterator=True, chunksize=20000,
+                                      usecols=["display_id", "document_id", "timestamp", "platform", "geo_location"])
 sampled_events = pd.concat([chunk[chunk['display_id'].isin(sampled_displays)] for chunk in reading_chunks_iterator])
 print("Finished filtering events.csv")
 # Generating a new dataframe from clicks_train.csv containing only the sampled displays
@@ -34,37 +37,51 @@ sampled_events["timestamp"] = real_timestamps
 initial_merge = sampled_clicks.merge(sampled_events, on="display_id")
 initial_merge.rename(index=str, columns={"timestamp": "click_tstamp"}, inplace=True)
 
+#initial_merge = pd.read_csv(r"C:\Users\Dean\Documents\Semester G\Data Science "
+#                            r"Workshop\Repo\DS-Workshop\initial_merge_2.csv")
 
 from features import platform_one_hot_encoding
 from features import event_time
 from features import is_weekend
 from features import ad_count_per_display
 from features import updated_clicks_per_appearances
+from features import advertiser_freq
+from features import campaign_freq
 
 # Merging Features
 per_display_features = [event_time.add_event_time_bin_feature,
                         platform_one_hot_encoding.add_platform_one_hot_encoding_feature,
                         is_weekend.add_is_weekend_feature,
                         ad_count_per_display.add_ad_count_per_display_feature]
-per_ad_features = [updated_clicks_per_appearances.add_clicks_per_appearances_ratio_feature]
 
 for feature in per_display_features:
     print("Now adding " + str(feature.__name__))
     feature_frame = feature(initial_merge)
-    initial_merge = initial_merge.merge(feature_frame, on="display_id", how="left")
+    initial_merge = initial_merge.merge(feature_frame, on="display_id", how="left", copy=False)
 
+initial_merge.drop(["click_tstamp", "platform"], axis=1, inplace=True)
+
+
+promoted = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
+                       "Data/promoted_content.csv")
+
+advertiser_freq_frame = advertiser_freq.advertiser_freq(promoted)
+campaign_freq_frame = campaign_freq.campaign_freq(promoted)
+
+
+promoted.drop(["advertiser_id", "campaign_id"], axis=1, inplace=True)
+
+initial_merge = initial_merge.merge(advertiser_freq_frame, on="ad_id", how="left", copy=False)
+initial_merge = initial_merge.merge(campaign_freq_frame, on="ad_id", how="left", copy=False)
+initial_merge = initial_merge.merge(promoted, on="ad_id", how="left", copy=False)
+
+del promoted
+
+per_ad_features = [updated_clicks_per_appearances.add_clicks_per_appearances_ratio_feature]
 for feature in per_ad_features:
     print("Now adding " + str(feature.__name__))
     feature_frame = feature(initial_merge)
-    initial_merge = initial_merge.merge(feature_frame, on="ad_id", how="left")
-
-
-initial_merge.head(30)
-
-promoted = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                         "Data/promoted_content.csv", usecols=["document_id", "ad_id"])
-
-initial_merge = initial_merge.merge(promoted, on="ad_id", how="left", sort=False)
+    initial_merge = initial_merge.merge(feature_frame, on="ad_id", how="left", copy=False)
 
 
 
@@ -82,19 +99,19 @@ reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data S
                          "Data/documents_topics.csv", iterator=True, chunksize=20000)
 topics = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in reading_chunks_iterator])
 
-print("finished filtering topics.csv")
+print("Finished filtering topics.csv")
 
 reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
                          "Data/documents_categories.csv", iterator=True, chunksize=20000)
 categories = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in reading_chunks_iterator])
 
-print("finished filtering categories.csv")
+print("Finished filtering categories.csv")
 
 reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
                          "Data/documents_entities.csv", iterator=True, chunksize=20000)
 entities = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in reading_chunks_iterator])
 
-print("finished filtering entities.csv")
+print("Finished filtering entities.csv")
 
 
 # Adding Topic, Entities and Categories Similarity Features
