@@ -1,12 +1,12 @@
 import numpy as np
 import pandas as pd
+from paths import *
 
 print("Beginning building of main table...")
 # Randomly Sampling a sixteenth of displays in the entire dataset (clicks_train.csv)
 
 # Importing display_id's from clicks.csv
-clicks = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                         "Data/clicks_train.csv", usecols=["display_id"])
+clicks = pd.read_csv(CLICKS_DEAN, usecols=["display_id"])
 
 del clicks  # No longer needed
 
@@ -16,14 +16,12 @@ l = len(unique_displays)
 sampled_displays = np.random.RandomState(0).choice(unique_displays, size=527331, replace=False)
 
 # Generating a new dataframe from events.csv containing only the sampled displays
-reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                                      "Data/events.csv", iterator=True, chunksize=20000,
+reading_chunks_iterator = pd.read_csv(EVENTS_DEAN, iterator=True, chunksize=20000,
                                       usecols=["display_id", "document_id", "timestamp", "platform", "geo_location"])
 sampled_events = pd.concat([chunk[chunk['display_id'].isin(sampled_displays)] for chunk in reading_chunks_iterator])
 print("Finished filtering events.csv")
 # Generating a new dataframe from clicks_train.csv containing only the sampled displays
-reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                                      "Data/clicks_train.csv", iterator=True, chunksize=20000)
+reading_chunks_iterator = pd.read_csv(CLICKS_DEAN, iterator=True, chunksize=20000)
 sampled_clicks = pd.concat([chunk[chunk['display_id'].isin(sampled_displays)] for chunk in reading_chunks_iterator])
 print("Finished filtering clicks.csv")
 
@@ -62,8 +60,7 @@ for feature in per_display_features:
 initial_merge.drop(["click_tstamp", "platform"], axis=1, inplace=True)
 
 
-promoted = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                       "Data/promoted_content.csv")
+promoted = pd.read_csv(PROMOTED_CONTENT_DEAN)
 
 advertiser_freq_frame = advertiser_freq.advertiser_freq(promoted)
 campaign_freq_frame = campaign_freq.campaign_freq(promoted)
@@ -95,20 +92,17 @@ all_docs = pd.Series(all_docs).unique()
 
 # Creating filtered versions of document attributes tables to include only relevant displays,
 # This makes calculations down the road much quicker
-reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                         "Data/documents_topics.csv", iterator=True, chunksize=20000)
+reading_chunks_iterator = pd.read_csv(DOC_TOPICS_DEAN, iterator=True, chunksize=20000)
 topics = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in reading_chunks_iterator])
 
 print("Finished filtering topics.csv")
 
-reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                         "Data/documents_categories.csv", iterator=True, chunksize=20000)
+reading_chunks_iterator = pd.read_csv(DOC_CATEGORIES_DEAN, iterator=True, chunksize=20000)
 categories = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in reading_chunks_iterator])
 
 print("Finished filtering categories.csv")
 
-reading_chunks_iterator = pd.read_csv("C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain "
-                         "Data/documents_entities.csv", iterator=True, chunksize=20000)
+reading_chunks_iterator = pd.read_csv(DOC_ENTETIES_DEAN, iterator=True, chunksize=20000)
 entities = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in reading_chunks_iterator])
 
 print("Finished filtering entities.csv")
