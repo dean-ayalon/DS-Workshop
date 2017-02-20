@@ -15,13 +15,13 @@ PAGE_VIEWS_YAIR =  "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competi
 
 
 #Deans paths
-CLICKS_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain/Data/clicks_train.csv"
-DOC_META_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain/Data/documents_meta.csv"
-PROMOTED_CONTENT_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain/Data/promoted_content.csv"
-DOC_TOPICS_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain/Data/documents_topics.csv"
-EVENTS_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain/Data/events.csv"
-DOC_CATEGORIES_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain/Data/documents_categories.csv"
-DOC_ENTITIES_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain/Data/documents_entities.csv"
+CLICKS_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain Data/clicks_train.csv"
+DOC_META_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain Data/documents_meta.csv"
+PROMOTED_CONTENT_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain Data/promoted_content.csv"
+DOC_TOPICS_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain Data/documents_topics.csv"
+EVENTS_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain Data/events.csv"
+DOC_CATEGORIES_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain Data/documents_categories.csv"
+DOC_ENTITIES_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain Data/documents_entities.csv"
 MAIN_TABLE_DEAN = r"C:\Users\Dean\Documents\Semester G\Data Science Workshop\Repo\DS-Workshop\final_main_table.csv"
 
 

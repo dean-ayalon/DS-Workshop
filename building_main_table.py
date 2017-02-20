@@ -1,19 +1,22 @@
 import numpy as np
 import pandas as pd
+import gc
 from paths import *
 
 print("Beginning building of main table...")
-# Randomly Sampling a sixteenth of displays in the entire dataset (clicks_train.csv)
+# Randomly sampling 3% of displays in the entire dataset (clicks_train.csv)
 
 # Importing display_id's from clicks.csv
-clicks = pd.read_csv(CLICKS_DEAN, usecols=["display_id"])
+all_display_ids = pd.read_csv(CLICKS_DEAN, usecols=["display_id"])
 
-del clicks  # No longer needed
+all_unique_display_ids = all_display_ids.display_id.unique()
+l = len(all_unique_display_ids)
 
-unique_displays = clicks.display_id.unique()
-l = len(unique_displays)
+# Freeing up memory
+del all_display_ids
+gc.collect()
 
-sampled_displays = np.random.RandomState(0).choice(unique_displays, size=527331, replace=False)
+sampled_displays = np.random.RandomState(0).choice(all_unique_display_ids, size=527331, replace=False)
 
 # Generating a new dataframe from events.csv containing only the sampled displays
 reading_chunks_iterator = pd.read_csv(EVENTS_DEAN, iterator=True, chunksize=20000,
@@ -57,7 +60,7 @@ for feature in per_display_features:
     feature_frame = feature(initial_merge)
     initial_merge = initial_merge.merge(feature_frame, on="display_id", how="left", copy=False)
 
-initial_merge.drop(["click_tstamp", "platform"], axis=1, inplace=True)
+initial_merge.drop(["click_tstamp", "platform", "geo_location"], axis=1, inplace=True)
 
 
 promoted = pd.read_csv(PROMOTED_CONTENT_DEAN)
@@ -73,6 +76,7 @@ initial_merge = initial_merge.merge(campaign_freq_frame, on="ad_id", how="left",
 initial_merge = initial_merge.merge(promoted, on="ad_id", how="left", copy=False)
 
 del promoted
+gc.collect()
 
 per_ad_features = [updated_clicks_per_appearances.add_clicks_per_appearances_ratio_feature]
 for feature in per_ad_features:
@@ -102,7 +106,7 @@ categories = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in 
 
 print("Finished filtering categories.csv")
 
-reading_chunks_iterator = pd.read_csv(DOC_ENTETIES_DEAN, iterator=True, chunksize=20000)
+reading_chunks_iterator = pd.read_csv(DOC_ENTITIES_DEAN, iterator=True, chunksize=20000)
 entities = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in reading_chunks_iterator])
 
 print("Finished filtering entities.csv")
@@ -131,16 +135,14 @@ for row in initial_merge.itertuples():
     entities_similarity = find_similarity(entities, doc_out, doc_in, "entity_id")
     entities_similarities.append(entities_similarity)
 
-    #print("for doc_out " + str(doc_out) + ", for doc_in " + str(doc_in))
-    #print("       top_sim = " + str(topic_similarity) + ", cat_sim=" + str(categories_similarity) + ", ent_sim = " +
-    #     str(entities_similarity))
     counter += 1
 
 # Creating the final table
-
 initial_merge["topic_sim"] = topic_similarities
 initial_merge["entities_sim"] = entities_similarities
 initial_merge["categories_sim"] = categories_similarities
+
+initial_merge.to_csv("final_main_table.csv", index=False)
 
 
 
