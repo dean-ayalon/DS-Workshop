@@ -1,70 +1,55 @@
 import numpy as np
-import pandas as pd
 import sklearn.preprocessing
 import sklearn.linear_model
-from scipy.stats import describe
-from scipy.stats.mstats import mode
-import statsmodels.api as sm
-import gc
-import seaborn as sns
-import sys
-import time
-sns.set(color_codes=True)
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
 
 
-#TODO: this function should recieve a list of features and dynamicly create a table from it.
+# TODO: this function should receive a list of features and dynamically create a table from it.
 def create_final_table_from_features(feature_list):
     pass
+
 
 def scale_features(final, features_names_list):
     for feature in features_names_list:
         final[feature] = sklearn.preprocessing.scale(final[feature])
 
-#recieves a dataframe with all the features and splits it to train and test
-def split_to_test_and_train(final ,write_to_files=False):
+# Receives a dataframe with all the features and splits it to train and test
+
+
+def split_to_test_and_train(final, write_to_files=False):
     displays = final.display_id.unique()
-    #create an array were 80% of the indexes labeled as True
-    rand_bool_array = np.random.rand(len(displays)) < 0.8
-    #in the train displays only indexes who are labeled as True will be.
+    # Create an array were 80% of the indexes labeled as True
+    rand_bool_array = np.random.RandomState(0).rand(len(displays)) < 0.8
+    # In the train displays only indexes who are labeled as True will be included.
     train_displays = displays[rand_bool_array]
     test_displays = displays[~rand_bool_array]
 
-    #TODO: Dean, Confirm you are fine with the change and if you do delete the code in the remark
-    '''
-    for i in range(len(displays)):
-    display = displays[i]
-    decider = np.random.uniform()
-    if decider <= 0.8:
-        train_displays.append(display)
-    else:
-        test_displays.append(display)
-    '''
     # Generating new separate train and test dataframes
     train_df = final[final.display_id.isin(train_displays)]
     test_df = final[final.display_id.isin(test_displays)]
 
-    if(write_to_files):
+    if write_to_files:
         train_df.to_csv("train_data.csv", index=False)
         test_df.to_csv("test_data.csv", index=False)
 
     return train_df, test_df
 
-#recieves dataframe and returns features vectors list (the points) their labels seperately
-def prepare_dataset_for_model(features_list,clicked):
+# Receives a dataframe and returns a feature vectors and a label vector
+
+
+def prepare_dataset_for_model(features_list, clicked):
     points = np.dstack(features_list)[0]
     labels = np.array(clicked)
     return points, labels
 
 # Testing the accuracy (using 0/1 loss)
 # Notice that the train data need to have a column named "probability_of_click"
-def accueacy_zero_one_lost(test_data):
+
+
+def accuracy_zero_one_loss(test_data):
     acc_test_frame = test_data[test_data.clicked == 1][["display_id", "ad_id"]]
 
     prediction_frame = test_data.sort_values(by="probability_of_click", ascending=False) \
-        .groupby("display_id").first() #TODO why not just do the group by first?
+        .groupby("display_id").first()
     predicted_ads = np.array(prediction_frame["ad_id"])
 
     acc_test_frame["prediction"] = predicted_ads
@@ -80,26 +65,27 @@ def MAP12_Accuracy(test_data):
     acc_counter = 0
     counter = 0
     for display in test_displays:
-        if not counter % 1872:
-            print("processed " + str(round((100 * counter / 187234))) + "% of rows")
+        if not counter % len(test_displays)/100:
+            print("processed " + str(round((100 * counter / len(test_displays)))) + "% of rows")
         display_df = test_data[test_data.display_id == display]
-        # print(display_df.head())
+        #print(display_df.head())
         true_ad = np.array(display_df[display_df.clicked == 1][["ad_id"]])[0][0]
-        # print(true_ad)
+        #print(true_ad)
         display_probs = np.array(display_df.probability_of_click)
-        # print(probs)
+        #print(display_probs)
         ads = np.array(display_df.ad_id)
-        # print(ads)
+        #print(ads)
         idx_sorted = display_probs.argsort()[::-1]
-        # rint(idx_sorted)
+        #print(idx_sorted)
 
         ads_sorted = ads[idx_sorted]
-        # print(ads_sorted)
+        #print(ads_sorted)
 
         idx_true = np.argwhere(ads_sorted == true_ad)[0][0] + 1
-        # print(1/idx_true)
+        #print(1/idx_true)
         acc_counter += 1 / idx_true
         counter += 1
+
 
     accuracy_map = acc_counter / len(test_displays)
     return accuracy_map
