@@ -67,13 +67,5 @@ def XCTRY(main_table,table_X,table_Y,feature_name_X,feature_name_Y,join_column,w
     return XCTRY
 
 
-main_table = pd.read_csv(MAIN_TABLE_YAIR)
-promoted = pd.read_csv(PROMOTED_CONTENT_YAIR)
-meta =pd.read_csv(DOC_META_YAIR)
-
-a = XCTRY(main_table,promoted,meta,'campaign_id','publisher_id','document_id',with_test=True)
-print(a.head(100))
-
-
 
 
