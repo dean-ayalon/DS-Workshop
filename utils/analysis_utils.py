@@ -65,27 +65,19 @@ def MAP12_Accuracy(test_data):
     acc_counter = 0
     counter = 0
     for display in test_displays:
-        if not counter % len(test_displays)/100:
-            print("processed " + str(round((100 * counter / len(test_displays)))) + "% of rows")
+        if not counter % (len(test_displays)//100):
+            print("processed " + str(round(100 * float(counter) / len(test_displays))) + "% of rows")
         display_df = test_data[test_data.display_id == display]
-        #print(display_df.head())
         true_ad = np.array(display_df[display_df.clicked == 1][["ad_id"]])[0][0]
-        #print(true_ad)
-        display_probs = np.array(display_df.probability_of_click)
-        #print(display_probs)
-        ads = np.array(display_df.ad_id)
-        #print(ads)
-        idx_sorted = display_probs.argsort()[::-1]
-        #print(idx_sorted)
 
+        display_probs = np.array(display_df.probability_of_click)
+        ads = np.array(display_df.ad_id)
+        idx_sorted = display_probs.argsort()[::-1]
         ads_sorted = ads[idx_sorted]
-        #print(ads_sorted)
 
         idx_true = np.argwhere(ads_sorted == true_ad)[0][0] + 1
-        #print(1/idx_true)
         acc_counter += 1 / idx_true
         counter += 1
-
 
     accuracy_map = acc_counter / len(test_displays)
     return accuracy_map
