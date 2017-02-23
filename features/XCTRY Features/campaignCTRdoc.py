@@ -1,4 +1,5 @@
 from features.XCTRY_feature import *
+from paths import *
 
 main_table = pd.read_csv(MAIN_TABLE_DEAN)
 main_table = main_table.rename(index=str, columns={"document_id_y": 'document_id'})
@@ -6,6 +7,8 @@ main_table = main_table.rename(index=str, columns={"document_id_y": 'document_id
 meta = pd.read_csv(DOC_META_DEAN)
 doc_category = pd.read_csv(DOC_CATEGORIES_DEAN)
 doc_topic = pd.read_csv(DOC_TOPICS_DEAN)
+doc_category = pd.read_csv(DOC_CATEGORIES_YAIR,)
+#doc_topic = pd.read_csv(DOC_TOPICS_YAIR)
 #events = pd.read_csv(EVENTS_YAIR)
 
 #TODO: this works
