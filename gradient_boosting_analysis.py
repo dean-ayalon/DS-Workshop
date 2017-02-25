@@ -7,7 +7,7 @@ import sklearn.ensemble
 import sklearn.grid_search
 from paths import *
 
-def perform_LogRegression_analysis(perform_cv=False):
+def perform_GBoost_analysis(perform_cv=False):
     # Importing main table
     final = pd.read_csv(MAIN_TABLE_DEAN)
 
@@ -44,16 +44,16 @@ def perform_LogRegression_analysis(perform_cv=False):
     test_points, test_labels = prepare_dataset_for_model(test_features_list, test_data.clicked)
 
     # Training Gradient Boosting model on training set
-    model = sklearn.linear_model.LogisticRegression()
+    model = sklearn.ensemble.GradientBoostingClassifier(max_depth=4, verbose=True)
     if not perform_cv:
         model.fit(train_points, train_labels)
     else:
         # Performing CV to tune the model's parameters
         print("Now performing Cross Validation to tune the max_depth parameter...")
-        parameters = {"C": [1, 10, 100, 1000], "penalty": ["l1","l2"]}
+        parameters = {"max_depth": [2, 3, 4, 5, 6]}
         cv = sklearn.grid_search.GridSearchCV(model, parameters, verbose=True)
         model = cv.fit(train_points, train_labels)
-        print("Performed CV, best parameters for LR model are " + str(model.best_params_))
+        print("Performed CV, best parameters for model are " + str(model.best_params_))
 
     # Testing the model on the test set
 
@@ -72,4 +72,4 @@ def perform_LogRegression_analysis(perform_cv=False):
     # Returning the model so we could extract its properties
     return model
 
-perform_LogRegression_analysis(perform_cv=True)
+perform_GBoost_analysis(perform_cv=True)

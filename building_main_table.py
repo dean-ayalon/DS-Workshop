@@ -68,14 +68,10 @@ def build_main_table(with_computation=False):
             initial_merge = initial_merge.merge(feature_frame, on="display_id", how="left", copy=False)
 
         initial_merge.drop(["click_tstamp", "platform", "geo_location"], axis=1, inplace=True)
-
-
         promoted = pd.read_csv(PROMOTED_CONTENT_DEAN)
 
         advertiser_freq_frame = advertiser_freq.advertiser_freq(promoted)
         campaign_freq_frame = campaign_freq.campaign_freq(promoted)
-
-
         promoted.drop(["advertiser_id", "campaign_id"], axis=1, inplace=True)
 
         initial_merge = initial_merge.merge(advertiser_freq_frame, on="ad_id", how="left", copy=False)
@@ -91,15 +87,12 @@ def build_main_table(with_computation=False):
             feature_frame = feature(initial_merge)
             initial_merge = initial_merge.merge(feature_frame, on="ad_id", how="left", copy=False)
 
-
-
         # In order to filter the relevant dataframes to include only relevant documents,
         # We first create an array containing only the document_id's appearing in the sampled displays
         docs_out = np.array(initial_merge.document_id_x)
         docs_in = np.array(initial_merge.document_id_y)
         all_docs = np.concatenate((docs_out, docs_in))
         all_docs = pd.Series(all_docs).unique()
-
 
         # Creating filtered versions of document attributes tables to include only relevant displays,
         # This makes calculations down the road much quicker
@@ -117,7 +110,6 @@ def build_main_table(with_computation=False):
         entities = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in reading_chunks_iterator])
 
         print("Finished filtering entities.csv")
-
 
         # Adding Topic, Entities and Categories Similarity Features
 
