@@ -52,5 +52,5 @@ f = create_categoryCTRsource(main_table, ad_doc_category, meta) #TODO: got memor
 
 #5
 ad_doc_topic = doc_topic.merge(main_table, on=['document_id'])[['ad_id','topic_id','document_id']]
-f = create_topicCTRpublisher(main_table,ad_doc_topic,meta)
+f = create_topicCTRpublisher(main_table, ad_doc_topic, meta)
 print(f.head(100))

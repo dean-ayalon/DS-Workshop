@@ -22,6 +22,7 @@ def add_event_time_bin_feature(main_table):
     click_timestamps = working_table["click_tstamp"]
     geolocations = working_table["geo_location"].apply(str)
 
+    # Timezone correction for the 4 most common countries in the data
     localized_hours = []
     for i in range(len(geolocations)):
         country = geolocations[i][:2]
