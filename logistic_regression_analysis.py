@@ -18,6 +18,7 @@ def perform_LogRegression_analysis(perform_cv=False):
                 "clicks_appearances_ratio", "ad_count_per_display", "ads_per_advertiser",
                 "ads_per_campaign"]
 
+
     # Short feature list - only important features according to model
     #features = ["topic_sim", "entities_sim", "categories_sim",
     #            "is_evening", "platform_is_mobile", "platform_is_desktop",
@@ -44,7 +45,7 @@ def perform_LogRegression_analysis(perform_cv=False):
     test_points, test_labels = prepare_dataset_for_model(test_features_list, test_data.clicked)
 
     # Training Gradient Boosting model on training set
-    model = sklearn.linear_model.LogisticRegression()
+    model = sklearn.linear_model.LogisticRegression(verbose=True)
     if not perform_cv:
         model.fit(train_points, train_labels)
     else:
@@ -63,13 +64,13 @@ def perform_LogRegression_analysis(perform_cv=False):
 
     # Evaluating the model using 0/1 loss
     zero_one_accuracy = accuracy_zero_one_loss(test_data)
-    print("0/1 Accuracy for Gradient Boosting Algorithm: " + str(zero_one_accuracy))
+    print("0/1 Accuracy for Logistic Regression Algorithm: " + str(zero_one_accuracy))
 
     # Evaluating the model using MAP@12 metric
     map12_accuracy = MAP12_Accuracy(test_data)
-    print("MAP@12 Accuracy for Gradient Boosting Algorithm: " + str(map12_accuracy))
+    print("MAP@12 Accuracy for Logistic Regression Algorithm: " + str(map12_accuracy))
 
     # Returning the model so we could extract its properties
     return model
 
-perform_LogRegression_analysis(perform_cv=True)
+best_model = perform_LogRegression_analysis()
