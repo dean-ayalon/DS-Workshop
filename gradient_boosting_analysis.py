@@ -71,5 +71,3 @@ def perform_GBoost_analysis(perform_cv=False):
 
     # Returning the model so we could extract its properties
     return model
-
-perform_GBoost_analysis(perform_cv=True)
