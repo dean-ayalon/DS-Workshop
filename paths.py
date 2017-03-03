@@ -10,7 +10,7 @@ DOC_TOPICS_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competit
 EVENTS_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/events.csv"
 DOC_CATEGORIES_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/documents_categories.csv"
 DOC_ENTITIES_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/documents_entities.csv"
-MAIN_TABLE_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/final_dataset.csv"
+MAIN_TABLE_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/DS-Workshop/final_main_table.csv"
 PAGE_VIEWS_YAIR =  "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/page_views_sample.csv"
 
 

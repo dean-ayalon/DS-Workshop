@@ -1,18 +1,16 @@
 import numpy as np
 import pandas as pd
+from paths import *
 import seaborn as sns
 sns.set(color_codes=True)
 
+
 #import events:
-events = pd.read_csv("C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/events.csv", nrows=1000000)
-#some kind of warning is here.
-#answer to this: http://stackoverflow.com/questions/33469277/pandas-read-table-reads-mixed-type-reading-string-as-hexadecimal
-events = events[["platform","display_id"]] #what does that syntax means?
-#events.columns = ["platform","display_id","disp2"]
+events = pd.read_csv(EVENTS_YAIR , usecols=["platform","display_id"],nrows=100000)
+#events = events[["platform","display_id"]] #what does that syntax means?
 
 #import click train
-clicks = pd.read_csv("C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/clicks_train.csv",nrows=1000000)
-clicks = clicks[["display_id","clicked"]]
+clicks = pd.read_csv(CLICKS_YAIR, usecols=["display_id","clicked"],nrows=100000)
 
 #merge
 merged = events.merge(clicks, on = "display_id")
@@ -22,3 +20,5 @@ merged = merged.groupby(["platform"],as_index=False).agg({"clicked":np.sum})
 
 #a test i did...
 #sns.pairplot(merged)
+
+
