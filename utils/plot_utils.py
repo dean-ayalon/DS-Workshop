@@ -4,9 +4,12 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from paths import *
+from utils.table_utils import get_clicks_per_advertiser_or_campaign, get_ads_per_feat
 
 #main_table = pd.read_csv(MAIN_TABLE_YAIR)
+#promoted = pd.read_csv(PROMOTED_CONTENT_YAIR)
 
+#TODO: consider change this to be like in the platform histogram
 def create_simple_histogram(categoryArr,countArr,title,x_label,y_label,file_name):
     fig = plt.figure()
     fig.suptitle(title,fontsize=14, fontweight='bold')
@@ -17,6 +20,25 @@ def create_simple_histogram(categoryArr,countArr,title,x_label,y_label,file_name
     plt.savefig(file_name)
     #plt.show()
 
+#creates a platform with two types of bars, mostly use to compare amount of clicks
+#against the amount of some feature_ids, in order to see their popularity.
+def create_two_bars_histogram(sample_size,feature_count,clicks,feature_ids,title,x_label,y_label):
+    place_on_chart = np.dot(np.arange(sample_size),2)
+    width = 0.5
+    fig, ax = plt.subplots()
+    adv_cnt_bars = ax.bar(place_on_chart,feature_count,width,color="r")
+    clicks_cnt_bars = ax.bar(place_on_chart+width,clicks,width)
+    ax.set_title(title)
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    ax.set_xticks(place_on_chart + width / 2)
+    ax.set_xticklabels(feature_ids, rotation=90, rotation_mode="anchor", ha="right",size=7)
+    ax.legend((adv_cnt_bars[0],clicks_cnt_bars[0]),('ads','clicks'),loc='center left',bbox_to_anchor=(1, 0.5))
+
+    #plt.savefig("testRand1.png")
+
+
+#creates the histogram of the platforms
 def plot_platform_histogram(main_table):
     platforms_count = main_table[["platform_is_desktop","platform_is_mobile","platform_is_tablet"]]
     platforms_count = np.array(platforms_count.sum())
@@ -36,6 +58,8 @@ def plot_platform_histogram(main_table):
     #plt.savefig("test.png")
     #plt.show()
 
+#creates a pie chart which show the amount of each display from some size,
+#where size is the number of ads in it.
 def create_disp_number_piechart(main_table):
     disp_size = main_table[["display_id","ad_id"]]
     disp_size = disp_size.groupby(["display_id"],as_index=False).agg({"ad_id":np.count_nonzero})\
@@ -54,3 +78,18 @@ def create_disp_number_piechart(main_table):
     ax1.axis('equal')
     #plt.savefig('test.png')
 
+#create two bar type histogram of advertiser and campaign
+def create_advertiser_or_campaign_pop_histogram(main_table,promoted,adv_or_camp,title):
+    adv_no=50
+    adv_clicks = get_clicks_per_advertiser_or_campaign(main_table,promoted,adv_or_camp)
+    ad_per_feat = get_ads_per_feat(promoted,adv_or_camp)
+    data = adv_clicks.merge(ad_per_feat,on=adv_or_camp)
+
+    indexes = np.random.RandomState(1).permutation(len(data))[:adv_no]
+    adv_cnt = np.array(data["ads_per_feature"][indexes])
+    clicks = np.array(data["clicks"][indexes])
+    adv_id = np.array(data[adv_or_camp][indexes])
+
+    #ploting:
+    create_two_bars_histogram(adv_no,adv_cnt,clicks,adv_id,title,
+                              adv_or_camp,"Count")

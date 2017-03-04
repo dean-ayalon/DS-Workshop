@@ -1,15 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Feb 14 18:50:07 2017
-
-@author: Eran
-"""
-'''
-from utils.plot_utils import *
-from utils.table_utils import return_unique_values_of_column_from_table, filter_table_by_unique_ids
-from paths import *
-'''
-
 import numpy as np
 import pandas as pd
 
