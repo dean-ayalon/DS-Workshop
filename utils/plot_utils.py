@@ -116,6 +116,8 @@ def create_ads_clicks_histogram(main_table,create_ad_appearance = False):
         create_simple_histogram(ads_id,clicks_count,"Number of times an ad got clicked",
                                 "Ad id","Click count")#,"ad_clicks.png",do_print=True)
 
+    #this code was used to create two bars histograms in order to see clicks vs appearance.
+    #this kind of analysis doesnt give meaningful information
     '''
     indexes = np.random.RandomState(100).permutation(len(ads))[:ad_no]
     ad_count = np.array(ads["amount"])[indexes]
@@ -127,5 +129,16 @@ def create_ads_clicks_histogram(main_table,create_ad_appearance = False):
                               "Ad apearence vs the clicks it got","Ad_id","count")
     '''
 
-def create_clicks_per_ad_histogram(main_table):
-    clicks = main_table.groupby(["ad_id"], as_index=False).agg({"clicked": np.sum})
+def create_similarity_histograms(main_table,ads_no,sim_name,sim_name_for_title):
+    ad_and_sim = main_table[["ad_id",sim_name]]
+    indexes = np.random.RandomState(0).permutation(len(ad_and_sim))[:ads_no]
+    ad_id = np.array(ad_and_sim["ad_id"])[indexes]
+    sim_rate = np.array(ad_and_sim[sim_name])[indexes]
+    create_simple_histogram(ad_id,sim_rate,sim_name_for_title+" similarity for "+str(ads_no)+" random ads",
+                            "Ad id",sim_name_for_title+" similarity rate")#,sim_name_for_title+"_sim.png",do_print=True)
+
+
+#tests: TODO delete later
+#create_similarity_histograms(main_table,1000,"topic_sim","Topics")
+#create_similarity_histograms(main_table,1000,"entities_sim","Entities")
+#create_similarity_histograms(main_table,100,"categories_sim","Categories")
