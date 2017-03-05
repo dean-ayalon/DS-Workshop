@@ -10,14 +10,16 @@ from utils.table_utils import get_clicks_per_advertiser_or_campaign, get_ads_per
 #promoted = pd.read_csv(PROMOTED_CONTENT_YAIR)
 
 #TODO: consider change this to be like in the platform histogram
-def create_simple_histogram(categoryArr,countArr,title,x_label,y_label,file_name):
+def create_simple_histogram(categoryArr,countArr,title,x_label,y_label,file_name='',
+                            do_print=False):
     fig = plt.figure()
     fig.suptitle(title,fontsize=14, fontweight='bold')
     ax = fig.add_subplot(111)
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
     plt.bar(left=categoryArr, height=countArr)
-    plt.savefig(file_name)
+    if(do_print):
+        plt.savefig(file_name)
     #plt.show()
 
 #creates a platform with two types of bars, mostly use to compare amount of clicks
@@ -93,3 +95,37 @@ def create_advertiser_or_campaign_pop_histogram(main_table,promoted,adv_or_camp,
     #ploting:
     create_two_bars_histogram(adv_no,adv_cnt,clicks,adv_id,title,
                               adv_or_camp,"Count")
+
+
+def create_ads_clicks_histogram(main_table,create_ad_appearance = False):
+    pd.options.mode.chained_assignment = None  # default='warn'
+    #prepare data to plot:
+    ads = main_table[["ad_id"]]
+    ads["amount"] = main_table["ad_id"].copy()
+    ads = ads.groupby(["ad_id"], as_index=False).agg({"amount": np.count_nonzero})
+    clicks = main_table.groupby(["ad_id"], as_index=False).agg({"clicked": np.sum})
+
+    indexes = np.random.RandomState(1).permutation(len(ads))[:30000]
+    ads_id = np.array(ads["ad_id"])[indexes]
+    ads_count = np.array(ads["amount"])[indexes]
+    clicks_count = np.array(clicks["clicked"])[indexes]
+    if(create_ad_appearance):
+        create_simple_histogram(ads_id,ads_count, "Number of times an ad appeared",
+                                "Ad id","Ad count")#,"ad_appearance.png",do_print=True)
+    else:
+        create_simple_histogram(ads_id,clicks_count,"Number of times an ad got clicked",
+                                "Ad id","Click count")#,"ad_clicks.png",do_print=True)
+
+    '''
+    indexes = np.random.RandomState(100).permutation(len(ads))[:ad_no]
+    ad_count = np.array(ads["amount"])[indexes]
+    clicks_count = np.array(clicks["clicked"])[indexes]
+    ad_ids = np.array(ads["ad_id"])[indexes]
+
+    #plot:
+    create_two_bars_histogram(ad_no,ad_count,clicks_count,ad_ids,
+                              "Ad apearence vs the clicks it got","Ad_id","count")
+    '''
+
+def create_clicks_per_ad_histogram(main_table):
+    clicks = main_table.groupby(["ad_id"], as_index=False).agg({"clicked": np.sum})
