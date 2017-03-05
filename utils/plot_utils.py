@@ -72,12 +72,16 @@ def create_disp_number_piechart(main_table):
     disp_size_type = np.array(disp_size_count['disp_size'])
 
     #now create the pie chart
-    #fig = plt.figure()
-    #ax = fig.add_subplot(111)
     fig1, ax1 = plt.subplots()
-    ax1.pie(disp_size_count_arr, labels=disp_size_type, autopct='%1.1f%%',
+    fig1.suptitle("Percentage of display sizes in the sample", fontsize=14, fontweight='bold')
+    colors = ['blue','green', 'red','skyblue','purple', 'yellow','black', 'white', 'lightcoral', 'pink']#, 'darkgreen', 'yellow', 'grey', 'violet', 'magenta', 'cyan']
+    patches, texts = ax1.pie(disp_size_count_arr,colors=colors,
             shadow=True, startangle=90)
     ax1.axis('equal')
+    percent = 100. * disp_size_count_arr / disp_size_count_arr.sum()
+    labels = ['{0} ads - {1:1.2f} %'.format(i, j) for i, j in zip(disp_size_type, percent)]
+    plt.legend(patches, labels, loc='center left', bbox_to_anchor=(-0.22, 0.5),
+               fontsize=10)
     #plt.savefig('test.png')
 
 #create two bar type histogram of advertiser and campaign
