@@ -21,13 +21,11 @@ events = pd.read_csv(EVENTS_YAIR, iterator=True, chunksize=100000)
 print("end restart iterator")
 
 print("start adding doc_ids")
-doc = pd.concat(pd.DataFrame(chunk['display_id']) for chunk in events)
+display = pd.concat(pd.DataFrame(chunk['display_id']) for chunk in events)
 print("end adding doc_ids")
-geo['display_id'] = doc['display_id']
+geo['display_id'] = display['display_id']
 print(geo.head(10))
 
 print("start export to file")
 geo.to_csv("display_geo.csv", index=False)
 print("end export to file")
-
-#pd.concat([chunk[chunk['display_id'].isin(sampled_displays)] for chunk in reading_chunks_iterator])
