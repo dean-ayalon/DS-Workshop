@@ -66,7 +66,7 @@ def MAP12_Accuracy(test_data):
     counter = 0
     for display in test_displays:
         if not counter % (len(test_displays)//100):
-            print("processed " + str(round(100 * float(counter) / len(test_displays))) + "% of rows")
+            print("processed " + str(round(100 * float(counter) / len(test_displays))) + "% of displays")
         display_df = test_data[test_data.display_id == display]
         true_ad = np.array(display_df[display_df.clicked == 1][["ad_id"]])[0][0]
 

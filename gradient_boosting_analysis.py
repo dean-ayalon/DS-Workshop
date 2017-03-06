@@ -7,6 +7,10 @@ import sklearn.ensemble
 import sklearn.grid_search
 from paths import *
 
+import matplotlib
+import matplotlib.pyplot as plt
+
+
 def perform_GBoost_analysis(perform_cv=False):
     # Importing main table
     final = pd.read_csv(MAIN_TABLE_DEAN)
@@ -50,7 +54,7 @@ def perform_GBoost_analysis(perform_cv=False):
     else:
         # Performing CV to tune the model's parameters
         print("Now performing Cross Validation to tune the max_depth parameter...")
-        parameters = {"max_depth": [2, 3, 4, 5, 6]}
+        parameters = {"max_depth": [2, 3, 4, 5]}
         cv = sklearn.grid_search.GridSearchCV(model, parameters, verbose=True)
         model = cv.fit(train_points, train_labels)
         print("Performed CV, best parameters for model are " + str(model.best_params_))
@@ -70,4 +74,25 @@ def perform_GBoost_analysis(perform_cv=False):
     print("MAP@12 Accuracy for Gradient Boosting Algorithm: " + str(map12_accuracy))
 
     # Returning the model so we could extract its properties
+
     return model
+
+model = perform_GBoost_analysis(perform_cv=True)
+
+def CV_Plot(model):
+    base_param_grid = model.grid_scores_
+    parameter_values = np.zeros(shape=len(base_param_grid))
+    validation_scores = np.zeros(shape=len(base_param_grid))
+
+    for i in range(len(base_param_grid)):
+        parameter_values[i] = base_param_grid[i].parameters['max_depth']
+        validation_scores[i] = base_param_grid[i].mean_validation_score
+
+    fig = plt.figure()
+    plt.plot(parameter_values, validation_scores)
+    plt.xlabel("Max Regression Tree Depth")
+    plt.ylabel("Mean MAP@12 Score")
+    fig.show()
+
+CV_Plot(model)
+

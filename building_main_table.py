@@ -40,7 +40,6 @@ def build_main_table(with_computation=False):
         real_timestamps = np.array(current_timestamps + 1465876799998) // 1000
         sampled_events["timestamp"] = real_timestamps
 
-
         # First Merge
         initial_merge = sampled_clicks.merge(sampled_events, on="display_id")
         initial_merge.rename(index=str, columns={"timestamp": "click_tstamp"}, inplace=True)
@@ -67,7 +66,7 @@ def build_main_table(with_computation=False):
             feature_frame = feature(initial_merge)
             initial_merge = initial_merge.merge(feature_frame, on="display_id", how="left", copy=False)
 
-        initial_merge.drop(["click_tstamp", "platform", "geo_location"], axis=1, inplace=True)
+        initial_merge.drop(["click_tstamp"], axis=1, inplace=True)
         promoted = pd.read_csv(PROMOTED_CONTENT_DEAN)
 
         advertiser_freq_frame = advertiser_freq.advertiser_freq(promoted)

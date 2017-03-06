@@ -31,9 +31,9 @@ def add_event_time_bin_feature(main_table):
             if country == "GB":
                 timezone_correction = 1
             elif country == "CA" or country == "US":
-                timezone_correction = -5
+                timezone_correction = -5.5
             elif country == "AU":
-                timezone_correction = 10
+                timezone_correction = 10.5
         timestamp = click_timestamps[i]
         as_datetime64 = np.datetime64(int(timestamp), 's')
         as_datetime = pd.to_datetime(as_datetime64)
