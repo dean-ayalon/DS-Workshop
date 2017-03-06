@@ -12,7 +12,7 @@ DOC_CATEGORIES_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Comp
 DOC_ENTITIES_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/documents_entities.csv"
 MAIN_TABLE_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/DS-Workshop/final_main_table.csv"
 PAGE_VIEWS_YAIR =  "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/page_views_sample.csv"
-
+DOC_GEO_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/doc_geo.csv"
 
 #Deans paths
 CLICKS_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain Data/clicks_train.csv"

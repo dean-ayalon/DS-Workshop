@@ -5,6 +5,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from paths import *
 from utils.table_utils import get_clicks_per_advertiser_or_campaign, get_ads_per_feat
+from features.geo_features import filter_countries_by_size
 
 #main_table = pd.read_csv(MAIN_TABLE_YAIR)
 #promoted = pd.read_csv(PROMOTED_CONTENT_YAIR)
@@ -21,6 +22,19 @@ def create_simple_histogram(categoryArr,countArr,title,x_label,y_label,file_name
     if(do_print):
         plt.savefig(file_name)
     #plt.show()
+
+def create_simple_pie_chart(count_arr,labels,pie_title,do_save=False,file_name=''):
+    fig1, ax1 = plt.subplots()
+    fig1.suptitle(pie_title, fontsize=14, fontweight='bold')
+    patches, texts = ax1.pie(count_arr, shadow=True, startangle=90)
+    ax1.axis('equal')
+
+    percent = 100. * count_arr / count_arr.sum()
+    labels = ['{0} - {1:1.2f} %'.format(i, j) for i, j in zip(labels, percent)]
+    plt.legend(patches, labels, loc='center left', bbox_to_anchor=(-0.22, 0.5),
+               fontsize=10)
+    if(do_save):
+        plt.savefig(file_name)
 
 #creates a platform with two types of bars, mostly use to compare amount of clicks
 #against the amount of some feature_ids, in order to see their popularity.
@@ -140,6 +154,20 @@ def create_similarity_histograms(main_table,ads_no,sim_name,sim_name_for_title):
     sim_rate = np.array(ad_and_sim[sim_name])[indexes]
     create_simple_histogram(ad_id,sim_rate,sim_name_for_title+" similarity for "+str(ads_no)+" random ads",
                             "Ad id",sim_name_for_title+" similarity rate")#,sim_name_for_title+"_sim.png",do_print=True)
+
+def create_countries_pie_chart(disp_geo,size):
+    countries = filter_countries_by_size(disp_geo,size)
+    country_name = np.array(countries["country"])
+    country_count = np.array(countries["country_count"])
+    create_simple_pie_chart(country_count, country_name, "Percentage of countries from Events table Which are at least " + str(100/size) +"% from all countries"
+                            ,do_save=True, file_name='countries_pie'+str(1/size)+'.png')
+
+#here will be plots we have to create and upload as an image, since we can't upload
+#their tables
+disp_geo = pd.read_csv(DOC_GEO_YAIR)
+create_countries_pie_chart(disp_geo,100)
+create_countries_pie_chart(disp_geo,1000)
+
 
 
 #tests: TODO delete later
