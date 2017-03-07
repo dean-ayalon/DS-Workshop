@@ -147,7 +147,7 @@ def build_main_table(with_computation=False):
 #creates a new csv file of the main table with the new feature
 def add_feature_to_main_table(main_table,feature,new_file_name):
     m = main_table.merge(feature, on="ad_id", how="left")
-    m.to_csv(new_file_name+".csv")
+    m.to_csv(new_file_name+".csv",index=False)
 
 
 

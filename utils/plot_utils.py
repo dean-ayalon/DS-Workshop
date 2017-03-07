@@ -164,7 +164,7 @@ def create_countries_pie_chart(disp_geo,size):
 
 #here will be plots we have to create and upload as an image, since we can't upload
 #their tables
-disp_geo = pd.read_csv(DOC_GEO_YAIR)
+disp_geo = pd.read_csv(DISPLAY_GEO_YAIR)
 create_countries_pie_chart(disp_geo,100)
 create_countries_pie_chart(disp_geo,1000)
 

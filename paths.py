@@ -2,6 +2,20 @@
     write the paths to tables on your local computer here
 '''
 
+samples_names = ['sample_clicks.csv','sample_document_categories.csv','sample_document_entities.csv',
+                 'sample_document_meta.csv','sample_topics.csv','sample_events.csv',
+                 'sample_page_views.csv','sample_promoted.csv']
+#general:
+DATASET = "final_main_table.csv"
+CLICKS = 'sample_clicks.csv'
+DOC_CATEGORIES = 'sample_document_categories.csv'
+DOC_ENTITIES = 'sample_document_entities.csv'
+DOC_META = 'sample_document_meta.csv'
+DOC_TOPICS = 'sample_topics.csv'
+EVENTS = 'sample_events.csv'
+PAGE_VIEWS = 'sample_page_views.csv'
+PROMOTED_CONTENT = 'sample_promoted.csv'
+
 #Yairs paths
 CLICKS_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/clicks_train.csv"
 DOC_META_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/documents_meta.csv"
@@ -12,7 +26,7 @@ DOC_CATEGORIES_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Comp
 DOC_ENTITIES_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/documents_entities.csv"
 MAIN_TABLE_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/DS-Workshop/final_main_table.csv"
 PAGE_VIEWS_YAIR =  "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/page_views_sample.csv"
-DOC_GEO_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/doc_geo.csv"
+DISPLAY_GEO_YAIR = "C:/Users/Yair/Desktop/Data Science Workshop/Outbrain Competition/display_geo.csv"
 
 #Deans paths
 CLICKS_DEAN = "C:/Users/Dean/Documents/Semester G/Data Science Workshop/Outbrain Data/clicks_train.csv"
