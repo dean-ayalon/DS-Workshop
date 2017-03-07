@@ -50,4 +50,4 @@ zf.close()
 print('finished zipping')
 
 #oz = zp.ZipFile('tables.zip')
-#sample_clicks = pd.read_csv(oz.read('sample_clicks.csv'))
+#sample_clicks = pd.read_csv(oz.open('sample_clicks.csv'))
