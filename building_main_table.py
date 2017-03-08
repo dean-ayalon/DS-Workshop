@@ -66,7 +66,7 @@ def build_main_table(with_computation=False):
             feature_frame = feature(initial_merge)
             initial_merge = initial_merge.merge(feature_frame, on="display_id", how="left", copy=False)
 
-        initial_merge.drop(["click_tstamp"], axis=1, inplace=True)
+        #initial_merge.drop(["click_tstamp"], axis=1, inplace=True) #TODO: this column is needed for the jupyter notebook
         promoted = pd.read_csv(PROMOTED_CONTENT_DEAN)
 
         advertiser_freq_frame = advertiser_freq.advertiser_freq(promoted)
