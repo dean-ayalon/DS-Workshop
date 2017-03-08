@@ -37,6 +37,19 @@ def create_binary_country(main_table):
 
     return res_frame
 
+def count_states(display_geo):
+    states = display_geo[['state']]
+    state_count = states.groupby("state").state.agg("count")
+    state_count = pd.Series(state_count.as_matrix())
+
+    # Extracting vector of unique displays
+    states = states["state"].unique()
+
+    # Creating result Dataframe, contaning the ad count for each display_id
+    # (has only display_id and ad_count columns)
+    res_frame = pd.DataFrame()
+    res_frame["states"] = states
+    res_frame["state_count"] = state_count.astype(int)
 
 #m.to_csv("main_with_countries.csv")
 
