@@ -17,7 +17,6 @@ def add_event_time_bin_feature(main_table):
     working_table = main_table.groupby("display_id").first().reset_index()
 
     relevant_countries = ["CA", "US", "AU", "GB"]
-    hours = list(range(24))  # Used to make hour calculations in modulo 24
 
     click_timestamps = working_table["click_tstamp"]
     geolocations = working_table["geo_location"].apply(str)
@@ -38,10 +37,11 @@ def add_event_time_bin_feature(main_table):
         as_datetime64 = np.datetime64(int(timestamp), 's')
         as_datetime = pd.to_datetime(as_datetime64)
         corrected_hour = as_datetime.hour + timezone_correction
-        if corrected_hour > 23:
+        if corrected_hour > 23.5:
             corrected_hour -= 24
-        localized_hour = hours[corrected_hour]
-        localized_hours.append(localized_hour)
+        elif corrected_hour < 0:
+            corrected_hour += 24
+        localized_hours.append(corrected_hour)
 
 
     # Creating boolean vectors for "binning" the hours

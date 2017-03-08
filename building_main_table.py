@@ -66,9 +66,14 @@ def build_main_table(with_computation=False):
             feature_frame = feature(initial_merge)
             initial_merge = initial_merge.merge(feature_frame, on="display_id", how="left", copy=False)
 
-        #initial_merge.drop(["click_tstamp"], axis=1, inplace=True) #TODO: this column is needed for the jupyter notebook
-        promoted = pd.read_csv(PROMOTED_CONTENT_DEAN)
+        # Trimming geolocation vector to include only country
+        original_geo = initial_merge.geo_location
+        new_geo = []
+        for i in range(len(original_geo)):
+            new_geo.append(str(original_geo[i])[:2])
+        initial_merge["geo_location"] = pd.Series(new_geo)
 
+        promoted = pd.read_csv(PROMOTED_CONTENT_DEAN)
         advertiser_freq_frame = advertiser_freq.advertiser_freq(promoted)
         campaign_freq_frame = campaign_freq.campaign_freq(promoted)
         promoted.drop(["advertiser_id", "campaign_id"], axis=1, inplace=True)

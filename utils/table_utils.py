@@ -26,6 +26,6 @@ def get_clicks_per_advertiser_or_campaign(main_table,promoted,adv_or_camp):
 def get_ads_per_feat(promoted,adv_or_camp):
     # Counting the number of times an advertiser appeared:
     ad_per_advertiser = promoted.groupby([adv_or_camp], as_index=False).agg({"ad_id": np.count_nonzero})\
-        .rename(index=str, columns={"ad_id": "ads_per_feature"})
+        .rename(index=str, columns={"ad_id": "ads_per_advertiser"})
     return ad_per_advertiser
 

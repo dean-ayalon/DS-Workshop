@@ -13,7 +13,7 @@ def add_ad_count_per_display_feature(main_table):
     # Extracting vector of unique displays
     displays = displays_and_ads["display_id"].unique()
 
-    # Creating result Dataframe, contaning the ad count for each display_id
+    # Creating result Dataframe, containing the ad count for each display_id
     # (has only display_id and ad_count columns)
     res_frame = pd.DataFrame()
     res_frame["display_id"] = displays
