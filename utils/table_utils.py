@@ -32,7 +32,7 @@ def get_ads_per_feat(promoted,adv_or_camp):
 #returns a DataFrame, which for eac feature id counts the feature appearance in the table.
 def count_feature(table,feature_name):
     # Extracting the display_id's vector from main table
-    feature_to count = table[[feature_name]]
+    feature_to_count = table[[feature_name]]
 
     # Counting how many times every display_id appears in the vector - this equals the ad count per each display
     ad_counts = displays_and_ads.groupby(feature_name).feature_name.agg("count")

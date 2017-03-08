@@ -154,6 +154,19 @@ def add_feature_to_main_table(main_table,feature,new_file_name):
     m = main_table.merge(feature, on="ad_id", how="left")
     m.to_csv(new_file_name+".csv",index=False)
 
+#in this code here i added the three more feature i created
+main_table = pd.read_csv(MAIN_TABLE_YAIR)
+topics = pd.read_csv(DOC_TOPICS_YAIR)
+disp_geo = pd.read_csv(DISPLAY_GEO_YAIR)
+top_pop = create_topics_popularity(main_table, topics)
+bin_country = create_binary_country(main_table)
+state_count = create_count_state(main_table,disp_geo)
+m = main_table.merge(top_pop, on="ad_id",how="left")
+m = m.merge(bin_country, on="display_id",how="left")
+m = m.merge(state_count, on="display_id",how="left")
+m.to_csv('final_dataset.csv')
+print(m.head())
+
 
 
 

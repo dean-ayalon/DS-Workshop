@@ -62,13 +62,6 @@ def create_topics_popularity(main_table, topics, with_confidence=True, with_test
     #len(topic_popularity) is 138378
     return topic_popularity
 
-#this code cn merge the feature to the main table. it keeps it size.
-#main_table = pd.read_csv(MAIN_TABLE_YAIR)
-#topics = pd.read_csv(DOC_TOPICS_YAIR)
-#T = create_topics_popularity(main_table, topics)
-#m = main_table.merge(T, on="ad_id",how="left")
-#print(T.head())
-
 #TODO: later trasfer this code to hist_utils
 ads_no = 30000
 indexes = np.random.RandomState(0).permutation(len(T))[:ads_no]
