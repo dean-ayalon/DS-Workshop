@@ -6,7 +6,7 @@ samples_names = ['sample_clicks.csv','sample_document_categories.csv','sample_do
                  'sample_document_meta.csv','sample_topics.csv','sample_events.csv',
                  'sample_page_views.csv','sample_promoted.csv']
 #general:
-DATASET = 'final_main_table.csv'
+DATASET = 'final_main_table_final.csv'
 CLICKS = 'sample_clicks.csv'
 DOC_CATEGORIES = 'sample_document_categories.csv'
 DOC_ENTITIES = 'sample_document_entities.csv'
