@@ -58,15 +58,16 @@ def accuracy_zero_one_loss(test_data):
 
     return accuracy
 
-#Computing MAP@12 Accuracy according to TODO: add the link to the relevent place in kaggle
-#TODO: i am not sure it is a good idea to add the "probability_of_click" column directly to the table. should check if it can be done when it is separate.
+
+# Calculating MAP@12 Accuracy
 def MAP12_Accuracy(test_data):
+    print("Now calculating MAP@12 accuracy, should take about 5 minutes")
     test_displays = test_data.display_id.unique()
     acc_counter = 0
     counter = 0
     for display in test_displays:
-        if not counter % (len(test_displays)//100):
-            print("processed " + str(round(100 * float(counter) / len(test_displays))) + "% of displays")
+        #if not counter % (len(test_displays)//100):
+        #    print("processed " + str(round(100 * float(counter) / len(test_displays))) + "% of displays")
         display_df = test_data[test_data.display_id == display]
         true_ad = np.array(display_df[display_df.clicked == 1][["ad_id"]])[0][0]
 

@@ -13,14 +13,16 @@ import matplotlib.pyplot as plt
 
 def perform_GBoost_analysis(perform_cv=False):
     # Importing main table
-    final = pd.read_csv(MAIN_TABLE_DEAN)
+    #final = pd.read_csv(MAIN_TABLE_DEAN)
+    final = pd.read_csv("final_dataset.csv")
 
     # Full feature list, before eliminating unimportant features
     features = ["topic_sim", "entities_sim", "categories_sim",
                 "is_morning", "is_noon", "is_afternoon", "is_evening", "is_night",
                 "is_weekend", "platform_is_mobile", "platform_is_desktop", "platform_is_tablet",
                 "clicks_appearances_ratio", "ad_count_per_display", "ads_per_advertiser",
-                "ads_per_campaign"]
+                "ads_per_campaign", "topic_popularity_conf", "country_is_US",
+                "country_is_GB", "country_is_CA", "country_is_AU"]
 
     # Short feature list - only important features according to model
     #features = ["topic_sim", "entities_sim", "categories_sim",
@@ -30,10 +32,17 @@ def perform_GBoost_analysis(perform_cv=False):
 
     features_to_scale = ["topic_sim", "entities_sim", "categories_sim",
                          "clicks_appearances_ratio", "ad_count_per_display",
-                         "ads_per_advertiser", "ads_per_campaign"]
+                         "ads_per_advertiser", "ads_per_campaign", "topic_popularity_conf"]
+
+    tpc_mean = final.topic_popularity_conf.mean()
+    tpc = final.topic_popularity_conf
+    tpc.fillna(value=tpc_mean, inplace=True)
+
+    final["topic_popularity_conf"]
 
     # Scaling all non-boolean features to zero mean and unit variance
     for feature in features_to_scale:
+        final[feature] = final[feature].astype(float)  # Avoids conversion warnings
         final[feature] = sklearn.preprocessing.scale(final[feature])
 
 
@@ -48,7 +57,7 @@ def perform_GBoost_analysis(perform_cv=False):
     test_points, test_labels = prepare_dataset_for_model(test_features_list, test_data.clicked)
 
     # Training Gradient Boosting model on training set
-    model = sklearn.ensemble.GradientBoostingClassifier(max_depth=4, verbose=True)
+    model = sklearn.ensemble.GradientBoostingClassifier(max_depth=6, verbose=True)
     if not perform_cv:
         model.fit(train_points, train_labels)
     else:
@@ -77,7 +86,7 @@ def perform_GBoost_analysis(perform_cv=False):
 
     return model
 
-model = perform_GBoost_analysis(perform_cv=True)
+model = perform_GBoost_analysis(perform_cv=False)
 
 def CV_Plot(model):
     base_param_grid = model.grid_scores_
