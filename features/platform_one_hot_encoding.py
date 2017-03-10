@@ -3,8 +3,13 @@ import pandas as pd
 
 # Performing one-hot-encoding on the categorical platform feature
 
+#events = events[events.platform != '\\N']
 
 def add_platform_one_hot_encoding_feature(main_table):
+    #cleaning irelevant values and change all values to numeric:
+    main_table = main_table[main_table.platform != '\\N']
+    main_table.platform = pd.to_numeric(main_table.platform)
+
     platforms_frame = main_table.groupby("display_id").first().reset_index()
 
     # Extracting the platform vector and creating 3 boolean vectors based on it

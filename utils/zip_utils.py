@@ -15,6 +15,8 @@ relevant_ads = return_unique_values_of_column_from_table('ad_id',main_table)
 samples_names = ['./sample_clicks.csv','./sample_document_categories.csv','./sample_document_entities.csv',
                  './sample_document_meta.csv','./sample_topics.csv','./sample_events.csv',
                  './sample_page_views.csv','./sample_promoted.csv','./sample_display_geo.csv']
+
+print('sampling tables and writing them to csv files...')
 #sampling and writing to csv relevant samples from the tables
 #len: 2724795
 sample_clicks = filter_table_by_unique_ids(relevant_displays,'display_id',CLICKS_YAIR)
@@ -43,6 +45,7 @@ sample_promoted.to_csv('./sample_promoted.csv',index=False)
 #len: 527331
 sample_display_geo = filter_table_by_unique_ids(relevant_displays,'display_id',DISPLAY_GEO_YAIR)
 sample_promoted.to_csv('./sample_display_geo.csv',index=False)
+print('finished sampling')
 
 #zip all of them using their path.
 print('writing to zip')
@@ -51,11 +54,13 @@ for name in samples_names:
 zf.close()
 print('finished zipping')
 
-#TODO: need to zip main separately
+#this code splits the data set into two different parts
+print('spliting and zipping main dataset')
 dataset = pd.read_csv(DATASET)
-isStateCount = True
-if(isStateCount):
-    dataset.drop('state_count',axis=1,inplace=True) #this feature is not good
+#isStateCount = True
+#if(isStateCount):
+#    dataset.drop('state_count',axis=1,inplace=True) #this feature is not good
+print("zipping first part")
 middle = len(dataset)//2
 #writing the first part
 zf = zp.ZipFile("./dataset_p1.zip", "w", zp.ZIP_DEFLATED,allowZip64=True)
@@ -63,17 +68,24 @@ dataset_p1 = dataset[:middle]
 dataset_p1.to_csv('./final_dataset_p1.csv',index=False)
 zf.write('./final_dataset_p1.csv')
 zf.close()
+print("finished zipping first part")
 
 #writing the second part
+print("zipping second part")
 zf = zp.ZipFile("./dataset_p2.zip", "w", zp.ZIP_DEFLATED,allowZip64=True)
 dataset_p2 = dataset[middle:]
 dataset_p2.to_csv('./final_dataset_p2.csv',index=False)
 zf.write('./final_dataset_p2.csv')
 zf.close()
+print("finished zipping second part")
+print('finished spliting and zipping main dataset')
+
 #Example how to read table from zip
 #oz = zp.ZipFile('tables.zip')
 #sample_clicks = pd.read_csv(oz.open('sample_clicks.csv'))
 
+
+#this code imports and unite the two parts of the dataset:
 z_dataset_p1 = zp.ZipFile('./dataset_p1.zip')
 z_dataset_p2 = zp.ZipFile('./dataset_p2.zip')
 
@@ -81,3 +93,7 @@ dataset_p1 = pd.read_csv(z_dataset_p1.open('final_dataset_p1.csv'))
 dataset_p2 = pd.read_csv(z_dataset_p2.open('final_dataset_p2.csv'))
 
 dataset_t = pd.concat([dataset_p1,dataset_p2],ignore_index=True)
+
+print('original dataset and united two halves of dataset are equal: '+str(dataset.equals(dataset_t)))
+#sanity check:
+#dataset.equals(dataset_t)
