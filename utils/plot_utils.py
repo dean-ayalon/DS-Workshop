@@ -38,21 +38,20 @@ def create_simple_pie_chart(count_arr,labels,pie_title,do_save=False,file_name='
 
 #creates a platform with two types of bars, mostly use to compare amount of clicks
 #against the amount of some feature_ids, in order to see their popularity.
-def create_two_bars_histogram(sample_size,feature_count,clicks,feature_ids,title,x_label,y_label):
+def create_two_bars_histogram(sample_size,feature_count,clicks,feature_ids,title,x_label,y_label,legend_prop_name):
     place_on_chart = np.dot(np.arange(sample_size),2)
     width = 0.5
     fig, ax = plt.subplots()
-    adv_cnt_bars = ax.bar(place_on_chart,feature_count,width,color="r")
+    prop_cnt_bars = ax.bar(place_on_chart,feature_count,width,color="r")
     clicks_cnt_bars = ax.bar(place_on_chart+width,clicks,width)
     ax.set_title(title)
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
     ax.set_xticks(place_on_chart + width / 2)
     ax.set_xticklabels(feature_ids, rotation=90, rotation_mode="anchor", ha="right",size=7)
-    ax.legend((adv_cnt_bars[0],clicks_cnt_bars[0]),('ads','clicks'),loc='center left',bbox_to_anchor=(1, 0.5))
+    ax.legend((prop_cnt_bars[0],clicks_cnt_bars[0]),(legend_prop_name,'clicks'),loc='center left',bbox_to_anchor=(1, 0.5))
 
     #plt.savefig("testRand1.png")
-
 
 #creates the histogram of the platforms
 def plot_platform_histogram(main_table):
@@ -112,7 +111,7 @@ def create_advertiser_or_campaign_pop_histogram(main_table,promoted,adv_or_camp,
 
     #ploting:
     create_two_bars_histogram(adv_no,adv_cnt,clicks,adv_id,title,
-                              adv_or_camp,"Count")
+                              adv_or_camp,"Count","ads")
 
 
 def create_ads_clicks_histogram(main_table,create_ad_appearance = False):
@@ -133,19 +132,6 @@ def create_ads_clicks_histogram(main_table,create_ad_appearance = False):
     else:
         create_simple_histogram(ads_id,clicks_count,"Number of times an ad got clicked",
                                 "Ad id","Click count")#,"ad_clicks.png",do_print=True)
-
-    #this code was used to create two bars histograms in order to see clicks vs appearance.
-    #this kind of analysis doesnt give meaningful information
-    '''
-    indexes = np.random.RandomState(100).permutation(len(ads))[:ad_no]
-    ad_count = np.array(ads["amount"])[indexes]
-    clicks_count = np.array(clicks["clicked"])[indexes]
-    ad_ids = np.array(ads["ad_id"])[indexes]
-
-    #plot:
-    create_two_bars_histogram(ad_no,ad_count,clicks_count,ad_ids,
-                              "Ad apearence vs the clicks it got","Ad_id","count")
-    '''
 
 def create_similarity_histograms(main_table,ads_no,sim_name,sim_name_for_title):
     ad_and_sim = main_table[["ad_id",sim_name]]

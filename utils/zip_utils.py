@@ -84,7 +84,7 @@ print('finished spliting and zipping main dataset')
 #oz = zp.ZipFile('tables.zip')
 #sample_clicks = pd.read_csv(oz.open('sample_clicks.csv'))
 
-
+#EXAMPLE:
 #this code imports and unite the two parts of the dataset:
 z_dataset_p1 = zp.ZipFile('./dataset_p1.zip')
 z_dataset_p2 = zp.ZipFile('./dataset_p2.zip')
