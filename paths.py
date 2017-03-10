@@ -24,7 +24,7 @@ DOC_TOPICS_YAIR = "C:/Users/Fun/Desktop/Data Science workshop/Outbrain/documents
 EVENTS_YAIR = "C:/Users/Fun/Desktop/Data Science workshop/Outbrain/events.csv"
 DOC_CATEGORIES_YAIR = "C:/Users/Fun/Desktop/Data Science workshop/Outbrain/documents_categories.csv"
 DOC_ENTITIES_YAIR = "C:/Users/Fun/Desktop/Data Science workshop/Outbrain/documents_entities.csv"
-#MAIN_TABLE_YAIR = "C:/Users/Fun/Desktop/Data Science workshop/Outbrain/final_main_table.csv"
+MAIN_TABLE_YAIR = "C:/Users/Fun/Desktop/Data Science workshop/Outbrain/final_main_table.csv"
 PAGE_VIEWS_YAIR =  "C:/Users/Fun/Desktop/Data Science workshop/Outbrain/page_views_sample.csv"
 DISPLAY_GEO_YAIR = "C:/Users/Fun/Desktop/Data Science workshop/tables/display_geo.csv"
 

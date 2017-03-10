@@ -166,7 +166,7 @@ state_count = create_count_state(main_table,disp_geo)
 m = main_table.merge(top_pop, on="ad_id",how="left")
 m = m.merge(bin_country, on="display_id",how="left")
 m = m.merge(state_count, on="display_id",how="left")
-m.to_csv('final_dataset.csv')
+m.to_csv('./final_dataset.csv',index=False)
 print(m.head())
 
 dataset = pd.read_csv(DATASET)
