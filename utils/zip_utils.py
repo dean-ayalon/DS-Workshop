@@ -9,12 +9,13 @@ main_table = pd.read_csv(MAIN_TABLE_YAIR)
 #with this object we zip
 zf = zp.ZipFile("./tables.zip", "w", zp.ZIP_DEFLATED,allowZip64=True)
 relevant_displays = return_unique_values_of_column_from_table('display_id',main_table)
-relevant_docs = return_unique_values_of_column_from_table('document_id_y',main_table)
+relevant_docs_in = return_unique_values_of_column_from_table('document_id_y',main_table)
+relevant_docs_out = return_unique_values_of_column_from_table('document_id_x',main_table)
 relevant_ads = return_unique_values_of_column_from_table('ad_id',main_table)
 
 samples_names = ['./sample_clicks.csv','./sample_document_categories.csv','./sample_document_entities.csv',
                  './sample_document_meta.csv','./sample_topics.csv','./sample_events.csv',
-                 './sample_page_views.csv','./sample_promoted.csv','./sample_display_geo.csv']
+                 './sample_promoted.csv','./sample_display_geo.csv']
 
 print('sampling tables and writing them to csv files...')
 #sampling and writing to csv relevant samples from the tables
@@ -22,22 +23,22 @@ print('sampling tables and writing them to csv files...')
 sample_clicks = filter_table_by_unique_ids(relevant_displays,'display_id',CLICKS_YAIR)
 sample_clicks.to_csv('./sample_clicks.csv',index=False)
 #len: 120546
-sample_doc_cat = filter_table_by_unique_ids(relevant_docs,'document_id',DOC_CATEGORIES_YAIR)
+sample_doc_cat = filter_table_by_unique_ids(relevant_docs_in,'document_id',DOC_CATEGORIES_YAIR)
 sample_doc_cat.to_csv('./sample_document_categories.csv',index=False)
 #len: 137335
-sample_doc_ent = filter_table_by_unique_ids(relevant_docs,'document_id',DOC_ENTITIES_YAIR)
+sample_doc_ent = filter_table_by_unique_ids(relevant_docs_in,'document_id',DOC_ENTITIES_YAIR)
 sample_doc_ent.to_csv('./sample_document_entities.csv',index=False)
 #len: 60484
-sample_doc_meta = filter_table_by_unique_ids(relevant_docs,'document_id',DOC_META_YAIR)
+sample_doc_meta = filter_table_by_unique_ids(relevant_docs_in,'document_id',DOC_META_YAIR)
 sample_doc_meta.to_csv('./sample_document_meta.csv',index=False)
 #len: 227895
-sample_doc_top = filter_table_by_unique_ids(relevant_docs,'document_id',DOC_TOPICS_YAIR)
+sample_doc_top = filter_table_by_unique_ids(relevant_docs_in,'document_id',DOC_TOPICS_YAIR)
 sample_doc_top.to_csv('./sample_topics.csv',index=False)
 #len:527331
 sample_events = filter_table_by_unique_ids(relevant_displays,'display_id',EVENTS_YAIR)
 sample_events.to_csv('./sample_events.csv',index=False)
 #len: 201077
-sample_page_views = filter_table_by_unique_ids(relevant_docs,'document_id',PAGE_VIEWS_YAIR)
+sample_page_views = filter_table_by_unique_ids(relevant_docs_out,'document_id',PAGE_VIEWS_YAIR)
 sample_page_views.to_csv('./sample_page_views.csv',index=False)
 #len: 143610
 sample_promoted = filter_table_by_unique_ids(relevant_ads,'ad_id',PROMOTED_CONTENT_YAIR)
@@ -53,6 +54,11 @@ for name in samples_names:
     zf.write(name)
 zf.close()
 print('finished zipping')
+
+#page_views is huge and therefore gets it's own zip:
+zf = zp.ZipFile("./page_views.zip", "w", zp.ZIP_DEFLATED,allowZip64=True)
+zf.write('./sample_page_views.csv')
+zf.close()
 
 #this code splits the data set into two different parts
 print('spliting and zipping main dataset')
