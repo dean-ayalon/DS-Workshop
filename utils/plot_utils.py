@@ -56,11 +56,11 @@ def create_two_bars_histogram(sample_size,feature_count,clicks,feature_ids,title
 
 #creates the histogram of the platforms
 def plot_platform_histogram(main_table):
-    platforms_count = main_table[["platform_is_desktop","platform_is_mobile","platform_is_tablet"]]
+    platforms_count = main_table[["platform_is_desktop", "platform_is_mobile", "platform_is_tablet"]]
     platforms_count = np.array(platforms_count.sum())
-    platforms_names = np.array(["Desktop","Mobile","Tablet"])
+    platforms_names = np.array(["Desktop", "Mobile", "Tablet"])
     fig = plt.figure()
-    fig.suptitle("Amount of platforms",fontsize=14, fontweight='bold')
+    fig.suptitle("Amount of clicks ", fontsize=14, fontweight='bold')
     ax = fig.add_subplot(111)
     ax.set_xlabel("Platform type")
     ax.set_ylabel("Amount")
