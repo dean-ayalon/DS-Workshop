@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import gc
 from paths import *
+from features.geo_features import create_binary_country, create_count_state
+from features.topic_popularity_feature import create_topics_popularity
 
 
 def build_main_table(with_computation=False):
@@ -167,6 +169,15 @@ m = m.merge(state_count, on="display_id",how="left")
 m.to_csv('final_dataset.csv')
 print(m.head())
 
+dataset = pd.read_csv(DATASET)
+#how to count nans:
+dataset.topic_popularity_conf.isnull().sum() #27867
+
+dataset.state_count.isnull().sum() #686849, 25% of all dataset...
+
+#fill Nan values:
+dataset.topic_popularity_conf = dataset.topic_popularity_conf.fillna(dataset.topic_popularity_conf.median())
+dataset.topic_popularity_conf.isnull().sum() #check that this worked
 
 
 
