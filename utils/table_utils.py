@@ -2,18 +2,18 @@ import numpy as np
 import pandas as pd
 
 
-#given a table name and a column name - returns only unique appearences of value from that column
+# Given a table name and a column name - returns only unique appearances of value from that column
 def return_unique_values_of_column_from_table(column_name,table_name):
     unique_column = pd.Series(np.array(table_name[column_name])).unique()
     return unique_column
 
-#this function gets an ITERATOR, which is table_to_filter
+# Uses an iterator to filter large tables according to specific values from a specific column
 def filter_table_by_unique_ids(filter_column,column_to_filter,table_to_filter):
     table_itr = pd.read_csv(table_to_filter, iterator=True, chunksize=1000000)
     filtered_table = pd.concat([chunk[chunk[column_to_filter].isin(filter_column)] for chunk in table_itr])
     return filtered_table
 
-#this function returns a Dataframe with the number of clicks each advertiser or campaign got.
+# This function returns a Dataframe with the number of clicks each advertiser or campaign got.
 def get_clicks_per_advertiser_or_campaign(main_table,promoted,adv_or_camp):
     advertisers = promoted[["ad_id",adv_or_camp]]
     clicks = main_table[["ad_id","clicked"]]
@@ -22,14 +22,14 @@ def get_clicks_per_advertiser_or_campaign(main_table,promoted,adv_or_camp):
         .rename(index=str, columns={"clicked": "clicks"})
     return adv_clicks
 
-#returns the number of ads each advertiser or campagin has.
+# Returns the number of ads each advertiser or campagin has.
 def get_ads_per_feat(promoted,adv_or_camp):
     # Counting the number of times an advertiser appeared:
     ad_per_advertiser = promoted.groupby([adv_or_camp], as_index=False).agg({"ad_id": np.count_nonzero})\
         .rename(index=str, columns={"ad_id": "ads_per_advertiser"})
     return ad_per_advertiser
 
-#returns a DataFrame, which for eac feature id counts the feature appearance in the table.
+# Returns a DataFrame, which for eac feature id counts the feature appearance in the table.
 def count_feature(table,feature_name):
     # Extracting the display_id's vector from main table
     feature_to_count = table[[feature_name]]
