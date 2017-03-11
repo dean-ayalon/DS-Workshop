@@ -6,7 +6,7 @@ import pandas as pd
 #events = events[events.platform != '\\N']
 
 def add_platform_one_hot_encoding_feature(main_table):
-    #cleaning irelevant values and change all values to numeric:
+    # Cleaning irrelevant values and change all values to numeric:
     main_table = main_table[main_table.platform != '\\N']
     main_table.platform = pd.to_numeric(main_table.platform)
 
