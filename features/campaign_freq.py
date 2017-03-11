@@ -1,12 +1,7 @@
 import numpy as np
-import pandas as pd
 
-# Similar to advertiser_freq, returns a mapping of ads and their campaign's "frequency"
+# Similar to advertiser_freq, returns a DataFrame of ads and their campaign's "frequency"
 # That is, num. of ads belonging to same campaign
-
-#promoted = pd.read_csv(r"C:\Users\Dean\Documents\Semester G\Data Science Workshop\Outbrain Data\promoted_content.csv")
-#promoted = pd.read_csv()
-
 def campaign_freq(promoted):
     # Loading the relevant tables
     ad_campaigns = promoted[["ad_id", "campaign_id"]]
@@ -16,11 +11,3 @@ def campaign_freq(promoted):
     campaign_freq_per_ad = ad_campaigns.merge(ad_per_campaign, on="campaign_id", copy=False)
     campaign_freq_per_ad.drop(['campaign_id'], axis=1, inplace=True)
     return campaign_freq_per_ad
-
-
-'''
-##in order to add the pop_vector to the main_table
-campaign_freq = advertiser_freq(main_table,promoted)
-df = pandas.DataFrame(campaign_freq,columns = ["ad_id","campaign_freq"])
-main_table.merge(df)
-'''

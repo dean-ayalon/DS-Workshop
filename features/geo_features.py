@@ -3,10 +3,6 @@ import numpy as np
 import pandas as pd
 from utils.table_utils import filter_table_by_unique_ids, return_unique_values_of_column_from_table
 
-#len(main_table) = 2724795
-#main_table = pd.read_csv(MAIN_TABLE_YAIR)
-#disp_geo = pd.read_csv(DISPLAY_GEO_YAIR)
-
 #returns the countries from display_geo who which are at list 1% from all the countries appears
 def filter_countries_by_size(disp_geo,size):
     countries = disp_geo.groupby(["country"], as_index=False).agg({"display_id": np.count_nonzero})\
@@ -15,6 +11,7 @@ def filter_countries_by_size(disp_geo,size):
     return countries
 
 def create_binary_country_vectors(main_table):
+    countries = main_table["geo_location"]
     country_is_US = np.array(countries == 'US', dtype=int)
     country_is_GB = np.array(countries == 'GB', dtype=int)
     country_is_CA = np.array(countries == 'CA', dtype=int)
@@ -34,11 +31,11 @@ def count_states(disp_geo):
     state_count = states.groupby("state").state.agg("count")
     state_count = pd.Series(state_count.as_matrix())
 
-    # Extracting vector of unique displays
+    # Extracting vector of unique states
     states = states["state"].unique()
 
-    # Creating result Dataframe, contaning the ad count for each display_id
-    # (has only display_id and ad_count columns)
+    # Creating result Dataframe, contaning the state count
+    # for each unique display
     res_frame = pd.DataFrame()
     res_frame["state"] = states
     res_frame["state_count"] = state_count.astype(int)
@@ -53,5 +50,4 @@ def create_count_state(main_table,disp_geo):
     res_frame = res_frame[res_frame.state != '--']
     res_frame.drop(['country','state','DMA'], axis=1, inplace=True)
     return res_frame
-#m.to_csv("main_with_countries.csv")
 

@@ -1,8 +1,5 @@
 # Adapted from https://www.kaggle.com/clustifier/outbrain-click-prediction/pandas-is-cool-lb-0-63714/code
 
-import numpy as np
-import pandas as pd
-
 # Currently without any regularization - an ad that appeared 350 times and got clicked 350 times,
 # is evaluated the same way as an ad that appeared once and got clicked once
 
