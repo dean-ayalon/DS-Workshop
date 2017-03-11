@@ -1,5 +1,10 @@
 import time
 
+# This feature calculates the time passed between when the ad was published
+# and when it got clicked.
+# We discarded it because there is a large amount of Nulls in the publish time
+# (meaning this information was missing for many ads)
+
 def ad_age_calculator(publish_times, click_times):
     real_times = []
     for i in range(len(publish_times)):
