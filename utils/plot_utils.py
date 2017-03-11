@@ -26,7 +26,9 @@ def create_simple_histogram(categoryArr,countArr,title,x_label,y_label,file_name
 def create_simple_pie_chart(count_arr,labels,pie_title,do_save=False,file_name=''):
     fig1, ax1 = plt.subplots()
     fig1.suptitle(pie_title, fontsize=14, fontweight='bold')
-    patches, texts = ax1.pie(count_arr, shadow=True, startangle=90)
+    colors = ['blue', 'green', 'red', 'skyblue', 'purple', 'yellow', 'black', 'white', 'lightcoral',
+              'pink', 'darkgreen', 'yellow', 'grey']
+    patches, texts = ax1.pie(count_arr, shadow=True, colors=colors, startangle=90)
     ax1.axis('equal')
 
     percent = 100. * count_arr / count_arr.sum()

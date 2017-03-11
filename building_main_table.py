@@ -2,11 +2,11 @@ import numpy as np
 import pandas as pd
 import gc
 from paths import *
-from features.geo_features import create_binary_country, create_count_state
+from features.geo_features import create_binary_country_vectors
 from features.topic_popularity_feature import create_topics_popularity
 
 
-def build_main_table(with_computation=False):
+def build_main_table(with_computation=False, with_similarity=False):
     if not with_computation:
         return pd.read_csv("final_main_table.csv")
 
@@ -27,12 +27,13 @@ def build_main_table(with_computation=False):
 
         sampled_displays = np.random.RandomState(0).choice(all_unique_display_ids, size=527331, replace=False)
 
-        # Generating a new dataframe from events.csv containing only the sampled displays
+        # Generating a new Dataframe from events.csv containing only the sampled displays
         reading_chunks_iterator = pd.read_csv(EVENTS_DEAN, iterator=True, chunksize=20000,
                                               usecols=["display_id", "document_id", "timestamp", "platform", "geo_location"])
         sampled_events = pd.concat([chunk[chunk['display_id'].isin(sampled_displays)] for chunk in reading_chunks_iterator])
+        sampled_events = sampled_events[sampled_events.platform != "\\N"]
         print("Finished filtering events.csv")
-        # Generating a new dataframe from clicks_train.csv containing only the sampled displays
+        # Generating a new Dataframe from clicks_train.csv containing only the sampled displays
         reading_chunks_iterator = pd.read_csv(CLICKS_DEAN, iterator=True, chunksize=20000)
         sampled_clicks = pd.concat([chunk[chunk['display_id'].isin(sampled_displays)] for chunk in reading_chunks_iterator])
         print("Finished filtering clicks.csv")
@@ -45,6 +46,8 @@ def build_main_table(with_computation=False):
         # First Merge
         initial_merge = sampled_clicks.merge(sampled_events, on="display_id")
         initial_merge.rename(index=str, columns={"timestamp": "click_tstamp"}, inplace=True)
+        # Dropping a display with null value in platform column
+        #initial_merge.drop(np.argwhere(initial_merge.display_id == 14004328).flatten(), inplace=True)
 
         #initial_merge = pd.read_csv(r"C:\Users\Dean\Documents\Semester G\Data Science "
         #                            r"Workshop\Repo\DS-Workshop\initial_merge_2.csv")
@@ -68,11 +71,13 @@ def build_main_table(with_computation=False):
             feature_frame = feature(initial_merge)
             initial_merge = initial_merge.merge(feature_frame, on="display_id", how="left", copy=False)
 
-        # Trimming geolocation vector to include only country
+        # Trimming geolocation vector to include only country, filling null values with US (mode)
         original_geo = initial_merge.geo_location
         new_geo = []
         for i in range(len(original_geo)):
             new_geo.append(str(original_geo[i])[:2])
+        new_geo = pd.Series(new_geo)
+        new_geo.fillna("US", inplace=True)
         initial_merge["geo_location"] = pd.Series(new_geo)
 
         promoted = pd.read_csv(PROMOTED_CONTENT_DEAN)
@@ -114,40 +119,50 @@ def build_main_table(with_computation=False):
 
         reading_chunks_iterator = pd.read_csv(DOC_ENTITIES_DEAN, iterator=True, chunksize=20000)
         entities = pd.concat([chunk[chunk['document_id'].isin(all_docs)] for chunk in reading_chunks_iterator])
-
         print("Finished filtering entities.csv")
 
+        top_pop = create_topics_popularity(initial_merge, topics)
+        top_pop.topic_popularity_conf.fillna(top_pop.topic_popularity_conf.mean(), inplace=True)
+        initial_merge = initial_merge.merge(top_pop, on="ad_id", how="left")
+
+        bin_country = create_binary_country_vectors(initial_merge)
+        initial_merge = pd.concat([initial_merge, bin_country], axis=1)
+
         # Adding Topic, Entities and Categories Similarity Features
+        if with_similarity:
+            topic_similarities = []
+            entities_similarities = []
+            categories_similarities = []
 
-        topic_similarities = []
-        entities_similarities = []
-        categories_similarities = []
+            from features.find_similarity import find_similarity
+            counter = 0
+            for row in initial_merge.itertuples():
+                if not counter % 27247:
+                    print("Adding similarity features: passed through " + (str(round(counter * 100 / 2724795))) + "% of rows")
+                doc_out = row.document_id_x
+                doc_in = row.document_id_y
 
-        from features.find_similarity import find_similarity
-        counter = 0
-        for row in initial_merge.itertuples():
-            if not counter % 27247:
-                print("Adding similarity features: passed through " + (str(round(counter * 100 / 2724795))) + "% of rows")
-            doc_out = row.document_id_x
-            doc_in = row.document_id_y
+                topic_similarity = find_similarity(topics, doc_out, doc_in, "topic_id")
+                topic_similarities.append(topic_similarity)
 
-            topic_similarity = find_similarity(topics, doc_out, doc_in, "topic_id")
-            topic_similarities.append(topic_similarity)
+                categories_similarity = find_similarity(categories, doc_out, doc_in, "category_id")
+                categories_similarities.append(categories_similarity)
 
-            categories_similarity = find_similarity(categories, doc_out, doc_in, "category_id")
-            categories_similarities.append(categories_similarity)
+                entities_similarity = find_similarity(entities, doc_out, doc_in, "entity_id")
+                entities_similarities.append(entities_similarity)
 
-            entities_similarity = find_similarity(entities, doc_out, doc_in, "entity_id")
-            entities_similarities.append(entities_similarity)
+                counter += 1
 
-            counter += 1
+            # Creating the final table
+            initial_merge["topic_sim"] = topic_similarities
+            initial_merge["entities_sim"] = entities_similarities
+            initial_merge["categories_sim"] = categories_similarities
 
-        # Creating the final table
-        initial_merge["topic_sim"] = topic_similarities
-        initial_merge["entities_sim"] = entities_similarities
-        initial_merge["categories_sim"] = categories_similarities
+        initial_merge.to_csv("final_final_final.csv", index=False)
 
-        return initial_merge
+        #return initial_merge
+
+build_main_table(with_computation=True, with_similarity=True)
 
 
 #recieves the main table, and a feature in format ["ad_id","some_feature"]
@@ -159,15 +174,8 @@ def add_feature_to_main_table(main_table,feature,new_file_name):
 #in this code here i added the three more feature i created
 main_table = pd.read_csv(MAIN_TABLE_YAIR)
 topics = pd.read_csv(DOC_TOPICS_YAIR)
-disp_geo = pd.read_csv(DISPLAY_GEO_YAIR)
 top_pop = create_topics_popularity(main_table, topics)
 bin_country = create_binary_country(main_table)
-state_count = create_count_state(main_table,disp_geo)
-m = main_table.merge(top_pop, on="ad_id",how="left")
-m = m.merge(bin_country, on="display_id",how="left")
-m = m.merge(state_count, on="display_id",how="left")
-m.to_csv('./final_dataset.csv',index=False)
-print(m.head())
 
 dataset = pd.read_csv(DATASET)
 #how to count nans:
