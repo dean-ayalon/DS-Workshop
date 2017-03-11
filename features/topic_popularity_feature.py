@@ -1,14 +1,14 @@
-from utils.plot_utils import create_simple_histogram
 from utils.table_utils import return_unique_values_of_column_from_table,filter_table_by_unique_ids
-from paths import *
 import numpy as np
-import pandas as pd
+
 
 
 def create_topics_popularity(main_table, topics, with_confidence=True, with_test=False):
+
     # ------------------------------Clicks per topic----------------------
     #this block of code counts for each relevant topic the amount of clicks it got.
     #get relevant ads and blocks
+
     relevant_ads_and_docs = main_table[["document_id_y", "ad_id", "clicked"]]\
         .rename(index=str, columns={"document_id_y": "document_id"})
 
