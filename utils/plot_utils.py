@@ -3,14 +3,10 @@ import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from paths import *
 from utils.table_utils import get_clicks_per_advertiser_or_campaign, get_ads_per_feat
 from features.geo_features import filter_countries_by_size
 
-#main_table = pd.read_csv(MAIN_TABLE_YAIR)
-#promoted = pd.read_csv(PROMOTED_CONTENT_YAIR)
 
-#TODO: consider change this to be like in the platform histogram
 def create_simple_histogram(categoryArr,countArr,title,x_label,y_label,file_name='',
                             do_print=False):
     fig = plt.figure()
@@ -22,6 +18,7 @@ def create_simple_histogram(categoryArr,countArr,title,x_label,y_label,file_name
     if(do_print):
         plt.savefig(file_name)
     #plt.show()
+
 
 def create_simple_pie_chart(count_arr,labels,pie_title,do_save=False,file_name=''):
     fig1, ax1 = plt.subplots()
@@ -37,6 +34,7 @@ def create_simple_pie_chart(count_arr,labels,pie_title,do_save=False,file_name='
                fontsize=10)
     if(do_save):
         plt.savefig(file_name)
+
 
 #creates a platform with two types of bars, mostly use to compare amount of clicks
 #against the amount of some feature_ids, in order to see their popularity.
@@ -54,6 +52,7 @@ def create_two_bars_histogram(sample_size,feature_count,clicks,feature_ids,title
     ax.legend((prop_cnt_bars[0],clicks_cnt_bars[0]),(legend_prop_name,'clicks'),loc='center left',bbox_to_anchor=(1, 0.5))
 
     #plt.savefig("testRand1.png")
+
 
 #creates the histogram of the platforms
 def plot_platform_histogram(main_table):
@@ -74,6 +73,7 @@ def plot_platform_histogram(main_table):
     #plt.bar(left=platforms_names, height=platforms_count)
     #plt.savefig("test.png")
     #plt.show()
+
 
 #creates a pie chart which show the amount of each display from some size,
 #where size is the number of ads in it.
@@ -99,6 +99,7 @@ def create_disp_number_piechart(main_table):
                fontsize=10)
     #plt.savefig('test.png')
 
+
 #create two bar type histogram of advertiser and campaign
 def create_advertiser_or_campaign_pop_histogram(main_table,promoted,adv_or_camp,title):
     adv_no=50
@@ -114,6 +115,7 @@ def create_advertiser_or_campaign_pop_histogram(main_table,promoted,adv_or_camp,
     #ploting:
     create_two_bars_histogram(adv_no,adv_cnt,clicks,adv_id,title,
                               adv_or_camp,"Count","ads")
+
 
 
 def create_ads_clicks_histogram(main_table,create_ad_appearance = False):
@@ -135,6 +137,7 @@ def create_ads_clicks_histogram(main_table,create_ad_appearance = False):
         create_simple_histogram(ads_id,clicks_count,"Number of times an ad got clicked",
                                 "Ad id","Click count")#,"ad_clicks.png",do_print=True)
 
+
 def create_similarity_histograms(main_table,ads_no,sim_name,sim_name_for_title):
     ad_and_sim = main_table[["ad_id",sim_name]]
     indexes = np.random.RandomState(0).permutation(len(ad_and_sim))[:ads_no]
@@ -143,6 +146,7 @@ def create_similarity_histograms(main_table,ads_no,sim_name,sim_name_for_title):
     create_simple_histogram(ad_id,sim_rate,sim_name_for_title+" similarity for "+str(ads_no)+" random ads",
                             "Ad id",sim_name_for_title+" similarity rate")#,sim_name_for_title+"_sim.png",do_print=True)
 
+
 def create_countries_pie_chart(disp_geo,size):
     countries = filter_countries_by_size(disp_geo,size)
     country_name = np.array(countries["country"])
@@ -150,16 +154,3 @@ def create_countries_pie_chart(disp_geo,size):
     create_simple_pie_chart(country_count, country_name,
                             "Countries Which are at least " + str(100/size) +"% from all countries")
                             #,do_save=True, file_name='countries_pie'+str(1/size)+'.png')
-
-#here will be plots we have to create and upload as an image, since we can't upload
-#their tables
-#disp_geo = pd.read_csv(DISPLAY_GEO_YAIR)
-#create_countries_pie_chart(disp_geo,100)
-#create_countries_pie_chart(disp_geo,1000)
-
-
-
-#tests: TODO delete later
-#create_similarity_histograms(main_table,1000,"topic_sim","Topics")
-#create_similarity_histograms(main_table,1000,"entities_sim","Entities")
-#create_similarity_histograms(main_table,100,"categories_sim","Categories")

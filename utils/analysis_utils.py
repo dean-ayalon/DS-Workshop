@@ -3,11 +3,6 @@ import sklearn.preprocessing
 import sklearn.linear_model
 
 
-# TODO: this function should receive a list of features and dynamically create a table from it.
-def create_final_table_from_features(feature_list):
-    pass
-
-
 def scale_features(final, features_names_list):
     for feature in features_names_list:
         final[feature] = sklearn.preprocessing.scale(final[feature])
