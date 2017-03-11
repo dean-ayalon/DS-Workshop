@@ -15,7 +15,6 @@ def filter_countries_by_size(disp_geo,size):
     return countries
 
 def create_binary_country_vectors(main_table):
-    countries = main_table["geo_location"]
     country_is_US = np.array(countries == 'US', dtype=int)
     country_is_GB = np.array(countries == 'GB', dtype=int)
     country_is_CA = np.array(countries == 'CA', dtype=int)
@@ -30,7 +29,7 @@ def create_binary_country_vectors(main_table):
 
     return res_frame
 
-def count_states(display_geo):
+def count_states(disp_geo):
     states = disp_geo[['state']]
     state_count = states.groupby("state").state.agg("count")
     state_count = pd.Series(state_count.as_matrix())

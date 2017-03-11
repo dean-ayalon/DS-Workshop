@@ -145,8 +145,9 @@ def create_countries_pie_chart(disp_geo,size):
     countries = filter_countries_by_size(disp_geo,size)
     country_name = np.array(countries["country"])
     country_count = np.array(countries["country_count"])
-    create_simple_pie_chart(country_count, country_name, "Percentage of countries from Events table Which are at least " + str(100/size) +"% from all countries"
-                            ,do_save=True, file_name='countries_pie'+str(1/size)+'.png')
+    create_simple_pie_chart(country_count, country_name,
+                            "Countries Which are at least " + str(100/size) +"% from all countries")
+                            #,do_save=True, file_name='countries_pie'+str(1/size)+'.png')
 
 #here will be plots we have to create and upload as an image, since we can't upload
 #their tables

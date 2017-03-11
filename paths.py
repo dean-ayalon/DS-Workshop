@@ -15,6 +15,8 @@ DOC_TOPICS = 'sample_topics.csv'
 EVENTS = 'sample_events.csv'
 PAGE_VIEWS = 'sample_page_views.csv'
 PROMOTED_CONTENT = 'sample_promoted.csv'
+DISPLAY_GEO = 'sample_display_geo.csv'
+
 
 #Yairs paths
 CLICKS_YAIR = "C:/Users/Fun/Desktop/Data Science workshop/Outbrain/clicks_train.csv"

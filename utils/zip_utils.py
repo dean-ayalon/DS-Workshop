@@ -45,7 +45,7 @@ sample_promoted = filter_table_by_unique_ids(relevant_ads,'ad_id',PROMOTED_CONTE
 sample_promoted.to_csv('./sample_promoted.csv',index=False)
 #len: 527331
 sample_display_geo = filter_table_by_unique_ids(relevant_displays,'display_id',DISPLAY_GEO_YAIR)
-sample_promoted.to_csv('./sample_display_geo.csv',index=False)
+sample_display_geo.to_csv('./sample_display_geo.csv',index=False)
 print('finished sampling')
 
 #zip all of them using their path.
@@ -55,42 +55,45 @@ for name in samples_names:
 zf.close()
 print('finished zipping')
 
-#page_views is huge and therefore gets it's own zip:
-zf = zp.ZipFile("./page_views.zip", "w", zp.ZIP_DEFLATED,allowZip64=True)
-zf.write('./sample_page_views.csv')
-zf.close()
-
 #this code splits the data set into two different parts
-print('spliting and zipping main dataset')
-dataset = pd.read_csv(DATASET)
-#isStateCount = True
-#if(isStateCount):
-#    dataset.drop('state_count',axis=1,inplace=True) #this feature is not good
-print("zipping first part")
-middle = len(dataset)//2
-#writing the first part
-zf = zp.ZipFile("./dataset_p1.zip", "w", zp.ZIP_DEFLATED,allowZip64=True)
-dataset_p1 = dataset[:middle]
-dataset_p1.to_csv('./final_dataset_p1.csv',index=False)
-zf.write('./final_dataset_p1.csv')
-zf.close()
-print("finished zipping first part")
+def split_in_half_and_zip_table(path,zip_name,file_name):
+    print('spliting and zipping dataset')
+    dataset = pd.read_csv(path)
+    #isStateCount = True
+    #if(isStateCount):
+    #    dataset.drop('state_count',axis=1,inplace=True) #this feature is not good
+    print("zipping first part")
+    middle = len(dataset)//2
+    #writing the first part
+    zf = zp.ZipFile("./"+zip_name+"_p1.zip", "w", zp.ZIP_DEFLATED,allowZip64=True)
+    dataset_p1 = dataset[:middle]
+    dataset_p1.to_csv('./'+file_name+'_p1.csv',index=False)
+    zf.write('./'+file_name+'_p1.csv')
+    zf.close()
+    print("finished zipping first part")
 
-#writing the second part
-print("zipping second part")
-zf = zp.ZipFile("./dataset_p2.zip", "w", zp.ZIP_DEFLATED,allowZip64=True)
-dataset_p2 = dataset[middle:]
-dataset_p2.to_csv('./final_dataset_p2.csv',index=False)
-zf.write('./final_dataset_p2.csv')
-zf.close()
-print("finished zipping second part")
-print('finished spliting and zipping main dataset')
+    #writing the second part
+    print("zipping second part")
+    zf = zp.ZipFile("./"+zip_name+"_p2.zip", "w", zp.ZIP_DEFLATED,allowZip64=True)
+    dataset_p2 = dataset[middle:]
+    dataset_p2.to_csv('./'+file_name+'_p2.csv',index=False)
+    zf.write('./'+file_name+'_p2.csv')
+    zf.close()
+    print("finished zipping second part")
+    print('finished spliting and zipping main dataset')
+
+#main dataset zips
+split_in_half_and_zip_table(DATASET,'dataset','final_dataset')
+#page_views is huge and therefore needs 2 zips
+split_in_half_and_zip_table(PAGE_VIEWS,'page_views','sample_page_views')
+
 
 #Example how to read table from zip
 #oz = zp.ZipFile('tables.zip')
 #sample_clicks = pd.read_csv(oz.open('sample_clicks.csv'))
 
 #EXAMPLE:
+dataset = pd.read_csv(DATASET)
 #this code imports and unite the two parts of the dataset:
 z_dataset_p1 = zp.ZipFile('./dataset_p1.zip')
 z_dataset_p2 = zp.ZipFile('./dataset_p2.zip')
