@@ -31,6 +31,7 @@ def build_main_table(with_computation=False, with_similarity=False):
         reading_chunks_iterator = pd.read_csv(EVENTS_DEAN, iterator=True, chunksize=20000,
                                               usecols=["display_id", "document_id", "timestamp", "platform", "geo_location"])
         sampled_events = pd.concat([chunk[chunk['display_id'].isin(sampled_displays)] for chunk in reading_chunks_iterator])
+        # Dropping a display with null value in platform column
         sampled_events = sampled_events[sampled_events.platform != "\\N"]
         print("Finished filtering events.csv")
         # Generating a new Dataframe from clicks_train.csv containing only the sampled displays
@@ -46,11 +47,7 @@ def build_main_table(with_computation=False, with_similarity=False):
         # First Merge
         initial_merge = sampled_clicks.merge(sampled_events, on="display_id")
         initial_merge.rename(index=str, columns={"timestamp": "click_tstamp"}, inplace=True)
-        # Dropping a display with null value in platform column
-        #initial_merge.drop(np.argwhere(initial_merge.display_id == 14004328).flatten(), inplace=True)
-
-        #initial_merge = pd.read_csv(r"C:\Users\Dean\Documents\Semester G\Data Science "
-        #                            r"Workshop\Repo\DS-Workshop\initial_merge_2.csv")
+        initial_merge.geo_location.fillna("US", inplace=True)
 
         from features import platform_one_hot_encoding
         from features import event_time
@@ -77,8 +74,7 @@ def build_main_table(with_computation=False, with_similarity=False):
         for i in range(len(original_geo)):
             new_geo.append(str(original_geo[i])[:2])
         new_geo = pd.Series(new_geo)
-        new_geo.fillna("US", inplace=True)
-        initial_merge["geo_location"] = pd.Series(new_geo)
+        initial_merge["geo_location"] = new_geo
 
         promoted = pd.read_csv(PROMOTED_CONTENT_DEAN)
         advertiser_freq_frame = advertiser_freq.advertiser_freq(promoted)
@@ -122,8 +118,8 @@ def build_main_table(with_computation=False, with_similarity=False):
         print("Finished filtering entities.csv")
 
         top_pop = create_topics_popularity(initial_merge, topics)
-        top_pop.topic_popularity_conf.fillna(top_pop.topic_popularity_conf.mean(), inplace=True)
         initial_merge = initial_merge.merge(top_pop, on="ad_id", how="left")
+        initial_merge.topic_popularity_conf.fillna(initial_merge.topic_popularity_conf.mean(), inplace=True)
 
         bin_country = create_binary_country_vectors(initial_merge)
         initial_merge = pd.concat([initial_merge, bin_country], axis=1)
