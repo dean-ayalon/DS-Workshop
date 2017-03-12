@@ -1,5 +1,7 @@
 from utils.table_utils import return_unique_values_of_column_from_table,filter_table_by_unique_ids
 import numpy as np
+import pandas as pd
+from paths import *
 
 
 
@@ -29,8 +31,7 @@ def create_topics_popularity(main_table, topics, with_confidence=True, with_test
 
     #filter from the whole docuemnt_topics table the relevant rows
     relevant_docs = return_unique_values_of_column_from_table('document_id_y', main_table)
-    f_topics = topics
-
+    f_topics = topics[topics.document_id.isin(relevant_docs)]
     #for each topic count the amount of docs it has
     docs_per_topic = f_topics.groupby(["topic_id"], as_index=False).agg({"document_id": np.count_nonzero})\
         .rename(index=str, columns={"document_id": "doc_No"})

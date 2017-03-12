@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import zipfile as zp
 from paths import *
 from utils.table_utils import return_unique_values_of_column_from_table, filter_table_by_unique_ids
@@ -13,11 +14,13 @@ zf = zp.ZipFile("./tables/tables.zip", "w", zp.ZIP_DEFLATED,allowZip64=True)
 relevant_displays = return_unique_values_of_column_from_table('display_id',main_table)
 relevant_docs_in = return_unique_values_of_column_from_table('document_id_y',main_table)
 relevant_docs_out = return_unique_values_of_column_from_table('document_id_x',main_table)
+all_docs = np.concatenate((np.array(relevant_docs_out), np.array(relevant_docs_in)))
+all_docs = pd.Series(all_docs).unique()
 relevant_ads = return_unique_values_of_column_from_table('ad_id',main_table)
 
 samples_names = ['./sample_clicks.csv','./sample_document_categories.csv','./sample_document_entities.csv',
                  './sample_document_meta.csv','./sample_topics.csv','./sample_events.csv',
-                 './sample_promoted.csv','./sample_display_geo.csv']
+                 './sample_promoted.csv','./sample_display_geo.csv','similarities.csv']
 
 print('sampling tables and writing them to csv files...')
 #sampling and writing to csv relevant samples from the tables
@@ -25,22 +28,22 @@ print('sampling tables and writing them to csv files...')
 sample_clicks = filter_table_by_unique_ids(relevant_displays,'display_id',CLICKS_YAIR)
 sample_clicks.to_csv('./sample_clicks.csv',index=False)
 
-sample_doc_cat = filter_table_by_unique_ids(relevant_docs_in,'document_id',DOC_CATEGORIES_YAIR)
+sample_doc_cat = filter_table_by_unique_ids(all_docs,'document_id',DOC_CATEGORIES_YAIR)
 sample_doc_cat.to_csv('./sample_document_categories.csv',index=False)
 
-sample_doc_ent = filter_table_by_unique_ids(relevant_docs_in,'document_id',DOC_ENTITIES_YAIR)
+sample_doc_ent = filter_table_by_unique_ids(all_docs,'document_id',DOC_ENTITIES_YAIR)
 sample_doc_ent.to_csv('./sample_document_entities.csv',index=False)
 
-sample_doc_meta = filter_table_by_unique_ids(relevant_docs_in,'document_id',DOC_META_YAIR)
+sample_doc_meta = filter_table_by_unique_ids(all_docs,'document_id',DOC_META_YAIR)
 sample_doc_meta.to_csv('./sample_document_meta.csv',index=False)
 
-sample_doc_top = filter_table_by_unique_ids(relevant_docs_in,'document_id',DOC_TOPICS_YAIR)
+sample_doc_top = filter_table_by_unique_ids(all_docs,'document_id',DOC_TOPICS_YAIR)
 sample_doc_top.to_csv('./sample_topics.csv',index=False)
 
 sample_events = filter_table_by_unique_ids(relevant_displays,'display_id',EVENTS_YAIR)
 sample_events.to_csv('./sample_events.csv',index=False)
 
-sample_page_views = filter_table_by_unique_ids(relevant_docs_out,'document_id',PAGE_VIEWS_YAIR)
+sample_page_views = filter_table_by_unique_ids(all_docs,'document_id',PAGE_VIEWS_YAIR)
 sample_page_views.to_csv('./sample_page_views.csv',index=False)
 
 sample_promoted = filter_table_by_unique_ids(relevant_ads,'ad_id',PROMOTED_CONTENT_YAIR)
@@ -59,7 +62,7 @@ print('finished zipping')
 
 #this code splits the data set into two different parts
 def split_in_half_and_zip_table(path,zip_name,file_name):
-    print('spliting and zipping dataset')
+    print('spliting and zipping '+file_name)
     dataset = pd.read_csv(path)
     #isStateCount = True
     #if(isStateCount):
@@ -82,7 +85,7 @@ def split_in_half_and_zip_table(path,zip_name,file_name):
     zf.write('./'+file_name+'_p2.csv')
     zf.close()
     print("finished zipping second part")
-    print('finished spliting and zipping main dataset')
+    print('finished spliting and zipping '+file_name)
 
 #main dataset zips
 split_in_half_and_zip_table(DATASET,'tables/dataset','final_dataset')
