@@ -18,9 +18,6 @@ def find_similarity(table, doc_out, doc_in, field):
     similarity = 0
     for out_index in range(len(out_items)):
         item = out_items[out_index]
-        #TODO: add lines:
-        #in_items = np.array(in_frame[field])
-        #in_conf = np.array(in_frame.confidence_level)
         if item in in_items:
             in_index = np.argwhere(in_items == item)[0][0]
             s1 = out_conf[out_index]
