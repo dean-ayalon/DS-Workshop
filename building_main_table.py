@@ -1,3 +1,7 @@
+# This is the script we used to build the main table from scratch on our computers.
+# It works with the full tables of the original dataset,
+# which we couldn't include in the git due to lack of space.
+
 import numpy as np
 import pandas as pd
 import gc
