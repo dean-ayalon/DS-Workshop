@@ -107,7 +107,7 @@ def create_advertiser_or_campaign_pop_histogram(main_table,promoted,adv_or_camp,
     ad_per_feat = get_ads_per_feat(promoted,adv_or_camp)
     data = adv_clicks.merge(ad_per_feat,on=adv_or_camp)
 
-    indexes = np.random.RandomState(1).permutation(len(data))[:adv_no]
+    indexes = np.random.RandomState(0).permutation(len(data))[:adv_no]
     adv_cnt = np.array(data["ads_per_feature"][indexes])
     clicks = np.array(data["clicks"][indexes])
     adv_id = np.array(data[adv_or_camp][indexes])
